@@ -8,13 +8,6 @@ import static primitives.Util.*;
  * email address : r0587860843@gmail.com
  */
 
-
-/**
- * student : Rivka Sheiner
- * id : 324060938
- * email address : r0587860843@gmail.com
- */
-
 /**
  * Test program for the 1st stage
  */
