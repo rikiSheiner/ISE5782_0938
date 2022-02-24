@@ -8,6 +8,13 @@ import static primitives.Util.*;
  * email address : r0587860843@gmail.com
  */
 
+
+/**
+ * student : Rivka Sheiner
+ * id : 324060938
+ * email address : r0587860843@gmail.com
+ */
+
 /**
  * Test program for the 1st stage
  */
@@ -15,7 +22,6 @@ public final class Main {
 
     /**
      * Main program to tests initial functionality of the 1st stage
-     *
      * @param args irrelevant here
      */
     public static void main(String[] args) {
