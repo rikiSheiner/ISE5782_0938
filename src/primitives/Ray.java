@@ -8,11 +8,11 @@ public class Ray {
     /**
      * the start point of the ray
      */
-    private Point p0;
+    private final Point p0;
     /**
      * the direction vector of the line
      */
-    private Vector dir;
+    private final Vector dir;
 
     /**
      * Ray constructor based on vector direction and start point
@@ -22,9 +22,9 @@ public class Ray {
     public Ray(Point p, Vector v) {
         this.p0 = p;
         if(v.length() == 1)
-            dir = v;
+            this.dir = v;
         else
-            dir = v.normalize();
+            this.dir = v.normalize();
     }
 
     /**

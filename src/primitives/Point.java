@@ -27,6 +27,14 @@ public class Point {
         xyz = double3;
     }
 
+    /**
+     * This method returns the 3D point
+     * @return Double3 - point 3D
+     */
+    public Double3 getXyz() {
+        return xyz;
+    }
+
     @Override
     public boolean equals(Object obj) {
         if (this == obj)

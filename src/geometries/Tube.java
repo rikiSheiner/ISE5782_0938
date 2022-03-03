@@ -13,7 +13,7 @@ public class Tube implements Geometry{
      */
     protected Ray axisRay;
     /**
-    *the distance between the axis ray to each point on the tube
+    * the distance between the axis ray to each point on the tube
      */
     protected double radius;
 
@@ -51,6 +51,8 @@ public class Tube implements Geometry{
 
     @Override
     public Vector getNormal(Point p) {
-        return null;
+        double t = (this.axisRay.getDir()).dotProduct(p.subtract(this.axisRay.getP0()));
+        Point o = this.axisRay.getP0().add(this.axisRay.getDir().scale(t));
+        return p.subtract(o).normalize();
     }
 }
