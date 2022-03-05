@@ -12,6 +12,9 @@ import primitives.*;
  */
 public class TubeTests {
 
+    /**
+     * Test method for {@link geometries.Tube#getNormal(primitives.Point)}.
+     */
     @Test
     void testGetNormal() {
        //============ Equivalence Partitions Tests ==============

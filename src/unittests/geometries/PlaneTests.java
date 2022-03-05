@@ -12,6 +12,9 @@ import primitives.*;
  */
 public class PlaneTests {
 
+    /**
+     * Test method for {@link geometries.Plane#Plane(Point,Point,Point)}
+     */
     @Test
     public void testConstructor() {
         // ============ Equivalence Partitions Tests ==============
@@ -36,6 +39,10 @@ public class PlaneTests {
                 "Constructed a plane with points on same straight line");
 
     }
+
+    /**
+     * Test method for {@link geometries.Plane#getNormal(primitives.Point)}.
+     */
     @Test
     void testGetNormal() {
         // ============ Equivalence Partitions Tests ==============

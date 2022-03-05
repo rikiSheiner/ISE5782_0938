@@ -12,6 +12,9 @@ import primitives.*;
  */
 public class VectorTests {
 
+    /**
+     * Test method for {@link primitives.Vector#add(primitives.Vector)}.
+     */
     @Test
     void testAdd() {
         // ============ Equivalence Partitions Tests ==============
@@ -20,6 +23,9 @@ public class VectorTests {
         assertEquals(new Vector(1,5,3),v1.add(v2),"add() wrong result of sum of vectors");
     }
 
+    /**
+     * Test method for {@link primitives.Vector#subtract(primitives.Vector)}.
+     */
     @Test
     void testSubtract() {
         // ============ Equivalence Partitions Tests ==============
@@ -28,6 +34,9 @@ public class VectorTests {
         assertEquals(new Vector(1,-1,-1),v1.subtract(v2),"subtract() wrong result of difference of vectors");
     }
 
+    /**
+     * Test method for {@link primitives.Vector#scale(double)}.
+     */
     @Test
     void testScale() {
         // ============ Equivalence Partitions Tests ==============
@@ -36,6 +45,9 @@ public class VectorTests {
         assertEquals(new Vector(6.2,9.3,3.1),v1.scale(a),"scale() wrong result of scalar multiplication");
     }
 
+    /**
+     * Test method for {@link primitives.Vector#dotProduct(primitives.Vector)}.
+     */
     @Test
     void testDotProduct() {
         // ============ Equivalence Partitions Tests ==============
@@ -44,6 +56,9 @@ public class VectorTests {
         assertEquals(8,v1.dotProduct(v2),"dotProduct() wrong result of dot product");
     }
 
+    /**
+     * Test method for {@link primitives.Vector#crossProduct(primitives.Vector)}.
+     */
     @Test
     void testCrossProduct() {
         Vector v1 = new Vector(1, 2, 3);
@@ -67,7 +82,9 @@ public class VectorTests {
                 "crossProduct() for parallel vectors does not throw an exception");
     }
 
-
+    /**
+     * Test method for {@link primitives.Vector#lengthSquared()}.
+     */
     @Test
     void testLengthSquared() {
         // ============ Equivalence Partitions Tests ==============
@@ -75,6 +92,9 @@ public class VectorTests {
         assertEquals(29,v1.lengthSquared(),"lengthSquared() wrong result of vector's length squared");
     }
 
+    /**
+     * Test method for {@link primitives.Vector#length()}.
+     */
     @Test
     void testLength() {
         // ============ Equivalence Partitions Tests ==============
@@ -82,6 +102,9 @@ public class VectorTests {
         assertEquals(Math.sqrt(29),v1.length(),"length() wrong result of vector's length");
     }
 
+    /**
+     * Test method for {@link primitives.Vector#normalize()}.
+     */
     @Test
     void testNormalize() {
         // ============ Equivalence Partitions Tests ==============

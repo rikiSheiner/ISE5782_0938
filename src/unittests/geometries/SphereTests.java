@@ -12,6 +12,9 @@ import primitives.*;
  */
 public class SphereTests {
 
+    /**
+     * Test method for {@link geometries.Sphere#getNormal(primitives.Point)}.
+     */
     @Test
     void testGetNormal() {
         // ============ Equivalence Partitions Tests ==============

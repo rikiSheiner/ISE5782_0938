@@ -12,6 +12,9 @@ import geometries.*;
  */
 public class PointTests {
 
+    /**
+     * Test method for {@link primitives.Point#add(primitives.Vector)}.
+     */
     @Test
     void testAdd() {
         // ============ Equivalence Partitions Tests ==============
@@ -20,6 +23,9 @@ public class PointTests {
         assertEquals(new Point(3,5,4),p.add(v),"add() wrong result of adding");
     }
 
+    /**
+     * Test method for {@link primitives.Point#subtract(primitives.Point)}.
+     */
     @Test
     void testSubtract() {
         // ============ Equivalence Partitions Tests ==============
@@ -28,6 +34,9 @@ public class PointTests {
         assertEquals(new Vector(3,-1,1),p2.subtract(p1),"subtract() wrong result of subtracting");
     }
 
+    /**
+     * Test method for {@link primitives.Point#distanceSquared(primitives.Point)}.
+     */
     @Test
     void testDistanceSquared() {
         // ============ Equivalence Partitions Tests ==============
@@ -36,6 +45,9 @@ public class PointTests {
         assertEquals(11,p1.distanceSquared(p2),"distanceSquared() wrong result of distance squared");
     }
 
+    /**
+     * Test method for {@link primitives.Point#distance(primitives.Point)}.
+     */
     @Test
     void testDistance() {
         // ============ Equivalence Partitions Tests ==============
