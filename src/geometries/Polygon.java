@@ -1,5 +1,6 @@
 package geometries;
 
+import java.util.LinkedList;
 import java.util.List;
 
 import primitives.*;
@@ -18,6 +19,9 @@ public class Polygon implements Geometry {
      * Associated plane in which the polygon lays
      */
     protected Plane plane;
+    /**
+    * The number of vertices of the polygon
+     */
     private int size;
 
     /**
@@ -85,6 +89,15 @@ public class Polygon implements Geometry {
     @Override
     public Vector getNormal(Point point) {
         return plane.getNormal();
+    }
+
+    @Override
+    public List<Point> findIntersections(Ray ray){
+        List<Point> allPoints = plane.findIntersections(ray);
+
+
+
+        return null;
     }
 }
 

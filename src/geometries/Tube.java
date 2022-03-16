@@ -2,6 +2,8 @@ package geometries;
 
 import primitives.*;
 
+import java.util.List;
+
 /**
  * Tube class represents a geometry object which is the set of points
  *that are all at the same distance from the axis
@@ -54,5 +56,10 @@ public class Tube implements Geometry{
         double t = (this.axisRay.getDir()).dotProduct(p.subtract(this.axisRay.getP0()));
         Point o = this.axisRay.getP0().add(this.axisRay.getDir().scale(t));
         return p.subtract(o).normalize();
+    }
+
+    @Override
+    public List<Point> findIntersections(Ray ray){
+        return null;
     }
 }

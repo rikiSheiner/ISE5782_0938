@@ -6,7 +6,7 @@ import primitives.*;
  * Geometry interface represents the behavior of all geometry objects
  *@author Rivka Sheiner
  */
-public interface Geometry {
+public interface Geometry extends Intersectable {
     /**
      * This method is used for finding the normal to specific point
      * on the geometry object.

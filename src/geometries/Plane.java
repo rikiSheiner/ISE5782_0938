@@ -2,6 +2,9 @@ package geometries;
 
 import primitives.*;
 
+import java.util.LinkedList;
+import java.util.List;
+
 /**
  * Plane class represents two-dimensional infinite surface in 3D Cartesian coordinate
  * @author Rivka Sheiner
@@ -69,5 +72,25 @@ public class Plane implements Geometry {
     @Override
     public Vector getNormal(Point p){
         return this.normal;
+    }
+
+    @Override
+    public List<Point> findIntersections(Ray ray){
+        if(this.q0.equals(ray.getP0()))
+            return null;
+
+        double numerator = this.normal.dotProduct(this.q0.subtract(ray.getP0()));
+        double denominator = this.normal.dotProduct(ray.getDir());
+
+        if(Util.isZero(denominator))
+            return null;
+
+        double t = numerator / denominator;
+        if(Util.isZero(t) || t < 0)
+            return null;
+
+        List<Point> points = new LinkedList<>();
+        points.add(ray.getPoint(t));
+        return points;
     }
 }

@@ -26,4 +26,11 @@ public class TubeTests {
         Point p2 = new Point(1,1,2);
         assertEquals(t.getAxisRay().getDir().dotProduct(t.getNormal(p2)),0d,"getNormal() wrong normal vector to tube in the height of the ray's head");
     }
+
+    /**
+     * Test method for {@link geometries.Tube#findIntersections(primitives.Ray)}.
+     */
+    @Test
+    public void testFindIntersections() {
+    }
 }
