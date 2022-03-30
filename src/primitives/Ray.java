@@ -1,5 +1,7 @@
 package primitives;
 
+import java.util.List;
+
 /**
  * Ray class represents ש line drawn from a certain point to infinity in only one direction
  * @author Rivka Sheiner
@@ -67,5 +69,27 @@ public class Ray {
         return this.p0.add(this.dir.scale(t));
     }
 
+    /**
+     * Function findClosestPoint finds the point with the minimal
+     * distance from the head of the ray and returns it
+     * @param points - List of Point
+     * @return Point - the closest point to the head of the ray
+     */
+    public Point findClosestPoint(List<Point> points){
+        if(points == null || points.size() == 0)
+            return null;
+
+        Point closestPoint = points.get(0);
+        double minDistance = this.p0.distanceSquared(closestPoint);
+        double tempDistance = 0;
+        for(int i = 1; i < points.size(); i++){
+            tempDistance = this.p0.distanceSquared(points.get(i));
+            if(tempDistance < minDistance){
+                closestPoint = points.get(i);
+                minDistance = tempDistance;
+            }
+        }
+        return closestPoint;
+    }
 
 }

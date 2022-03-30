@@ -45,7 +45,7 @@ public class GeometriesTests {
         Geometries geometries2 = new Geometries(new Plane(new Point(1,0,0), new Vector(0,1,0))
                 , new Triangle(new Point(0.5,0,-1), new Point(2,0,1),new Point(4,0,-1))
                 , new Sphere(new Point(2,0,0),0.5));
-        result = geometries2.findIntersections(new Ray(new Point(2,-1,0), new Vector(0,1,0)));
+        result = geometries2.findIntersections(new Ray(new Point(2,-0.25,0), new Vector(0,1,0)));
         assertEquals(3, result.size(), "Ray crosses all geometries");
     }
 }

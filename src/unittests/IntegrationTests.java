@@ -11,7 +11,11 @@ import geometries.*;
 
 import java.util.List;
 
-public class IntegrationTestCameraIntersections {
+/**
+ * IntegrationTests class is used for testing the intersections points
+ * of geometries with rays from the camera view plane.
+ */
+public class IntegrationTests {
 
     /**
      * Test method for

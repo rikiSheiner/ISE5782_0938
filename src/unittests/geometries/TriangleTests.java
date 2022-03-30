@@ -6,6 +6,7 @@ import org.junit.jupiter.api.Test;
 
 import java.util.List;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
 /**
@@ -24,7 +25,11 @@ public class TriangleTests {
 
         // ============ Equivalence Partitions Tests ==============
 
-        // TC01: Ray is inside triangle
+        // TC01: Ray intersects with triangle (1 point)
+        Triangle triangle1 = new Triangle(new Point(0,-3,0),new Point(0,3,0),new Point(3,0,0));
+        result = triangle1.findIntersections(new Ray(new Point(1,1,-1), new Vector(0,0,1)));
+        assertEquals(new Point(1,1,0), result.get(0), "Ray intersects the triangle");
+
 
         // TC02: Ray is outside against edge (0 points)
         assertNull(triangle.findIntersections(new Ray(new Point(0,1,0), new Vector(0,0,1))),

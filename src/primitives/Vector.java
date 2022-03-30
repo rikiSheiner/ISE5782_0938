@@ -92,9 +92,13 @@ public class Vector extends Point{
      * @param v - the second vector of the cross product
      * @return Vector - the normal vector to two vectors
      */
-    public Vector crossProduct(Vector v) {
-        return new Vector(new Double3(this.xyz.d2 * v.xyz.d3 - this.xyz.d3 * v.xyz.d2,
-                this.xyz.d3 * v.xyz.d1 - this.xyz.d1 * v.xyz.d3, this.xyz.d1 * v.xyz.d2 - this.xyz.d2 * v.xyz.d1));
+    public Vector crossProduct(Vector v) throws IllegalArgumentException{
+        Double3 double3 = new Double3(this.xyz.d2 * v.xyz.d3 - this.xyz.d3 * v.xyz.d2,
+                this.xyz.d3 * v.xyz.d1 - this.xyz.d1 * v.xyz.d3, this.xyz.d1 * v.xyz.d2 - this.xyz.d2 * v.xyz.d1);
+        if(double3.getD1() == 0 && double3.getD2() == 0 && double3.getD3() == 0)
+            throw new IllegalArgumentException("Cross product does not exist");
+        return new Vector(double3);
+
     }
 
     /**
