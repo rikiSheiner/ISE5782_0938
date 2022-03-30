@@ -124,9 +124,7 @@ public class Vector extends Point{
      */
     public Vector normalize() {
         double len = this.length();
-        if(len != 1)
-            return new Vector(new Double3(this.xyz.d1/len,this.xyz.d2/len,this.xyz.d3/len));
-        return this;
+        return new Vector(xyz.reduce(len));
     }
 
 

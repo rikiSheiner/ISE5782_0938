@@ -25,32 +25,27 @@ public class Triangle extends Polygon {
         if(points == null)
             return null;
 
-        Point p0 = ray.getP0();
-        Vector v1 = this.vertices.get(0).subtract(p0);
-        Vector v2 = this.vertices.get(1).subtract(p0);
-        Vector v3 = this.vertices.get(2).subtract(p0);
-        Vector n1 = (v1.crossProduct(v2)).normalize();
-        Vector n2 = (v2.crossProduct(v3)).normalize();
-        Vector n3 = (v3.crossProduct(v1)).normalize();
+        Point p = points.get(0); // the intersection point with the plane of the triangle
 
-        double v1n1 = v1.dotProduct(n1);
-        double v1n2 = v1.dotProduct(n2);
-        double v1n3 = v1.dotProduct(n3);
-        double v2n1 = v2.dotProduct(n1);
-        double v2n2 = v2.dotProduct(n2);
-        double v2n3 = v2.dotProduct(n3);
-        double v3n1 = v3.dotProduct(n1);
-        double v3n2 = v3.dotProduct(n2);
-        double v3n3 = v3.dotProduct(n3);
+        //edge 0
+        Vector c ;//= new Vector(1,1,1);
+        Vector edge0 = this.vertices.get(1).subtract(this.vertices.get(0));
+        Vector vp0 = p.subtract(this.vertices.get(0));
+        c = edge0.crossProduct(vp0);
+        if(this.plane.getNormal().dotProduct(c) < 0) return null; //p is on the right side
 
-        if(v1n1 < 0.0 && v1n2 < 0.0 && v1n3 < 0.0 && v2n1 < 0.0 && v2n2 < 0.0
-                && v2n3 < 0.0 && v3n1 < 0.0 && v3n2 < 0.0 && v3n3 < 0.0)
-            return points;
+        //edge 1
+        Vector edge1 = this.vertices.get(2).subtract(this.vertices.get(1));
+        Vector vp1 = p.subtract(this.vertices.get(1));
+        c = edge1.crossProduct(vp1);
+        if(this.plane.getNormal().dotProduct(c) < 0) return null; //p is on the right side
 
-        if(v1n1 > 0.0 && v1n2 > 0.0 && v1n3 > 0.0 && v2n1 > 0.0 && v2n2 > 0.0
-                && v2n3 > 0.0 && v3n1 > 0.0 && v3n2 > 0.0 && v3n3 > 0.0)
-            return points;
+        //edge 2
+        Vector edge2 = this.vertices.get(0).subtract(this.vertices.get(2));
+        Vector vp2 = p.subtract(this.vertices.get(2));
+        c = edge2.crossProduct(vp2);
+        if(this.plane.getNormal().dotProduct(c) < 0) return null; //p is on the right side
 
-        return null;
+        return points;
     }
 }

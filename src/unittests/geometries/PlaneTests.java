@@ -28,6 +28,7 @@ public class PlaneTests {
             fail("Failed constructing a correct plane");
         }
 
+
         // =============== Boundary Values Tests ==================
 
         // TC11: First point = second point
