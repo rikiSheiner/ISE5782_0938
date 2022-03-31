@@ -1,7 +1,8 @@
 package renderer;
 import primitives.*;
 
-import static primitives.Util.isZero;
+import java.util.MissingResourceException;
+import java.lang.UnsupportedOperationException;
 
 /**
  * Camera class represents the camera which takes the picture
@@ -36,6 +37,14 @@ public class Camera {
      * the distance from the camera to the view plane
      */
     private double distance;
+    /**
+     * the producer of the picture
+     */
+    private ImageWriter imageWriter;
+    /**
+     * the base of the ray tracing for the camera
+     */
+    private RayTracerBase rayTracer;
 
     public double getHeight() {
         return height;
@@ -49,6 +58,13 @@ public class Camera {
         return distance;
     }
 
+    /**
+     * Camera parameter constructor
+     * @param location
+     * @param v_to
+     * @param v_up
+     * @throws IllegalArgumentException
+     */
     public Camera(Point location, Vector v_to, Vector v_up) throws IllegalArgumentException{
         this.p0 = location;
         this.vTo = v_to.normalize();
@@ -69,13 +85,24 @@ public class Camera {
         return this;
     }
 
+    public Camera setImageWriter(ImageWriter imageWriter) {
+        this.imageWriter = imageWriter;
+        return this;
+    }
+
+    public Camera setRayTracer(RayTracerBase rayTracer) {
+        this.rayTracer = rayTracer;
+        return this;
+    }
+
     /**
-     *
-     * @param nX
-     * @param nY
-     * @param j
-     * @param i
-     * @return
+     * The function ConstructRay is used for creation of ray through
+     * specific pixel in the view plane.
+     * @param nX - the number of pixels in X axis
+     * @param nY - the number of pixels in Y axis
+     * @param j - the index on X axis
+     * @param i - the index on Y axis
+     * @return Ray
      */
     public Ray constructRay(int nX, int nY, int j, int i){
         Point Pc = p0.add(vTo.scale(distance));
@@ -95,4 +122,59 @@ public class Camera {
 
         return new Ray(p0,Pij.subtract(p0));
     }
+
+    /**
+     * Function renderImage is used for constructing a rays through each pixel
+     * in the view plane and coloring the pixels of the image accordingly.
+     * @throws MissingResourceException
+     * @throws UnsupportedOperationException
+     */
+    public void renderImage() throws MissingResourceException, UnsupportedOperationException {
+        if(p0 == null || vTo == null || vUp == null || imageWriter == null || rayTracer == null )
+            throw new MissingResourceException("Can't render image because of lack of resources", "Camera", "");
+
+        int nX = imageWriter.getNx();
+        int nY = imageWriter.getNy();
+
+        for(int i = 0;  i< nY; i++){
+            for(int j = 0; j < nX; j++){
+                Ray ray = constructRay(nX, nY, j, i);
+                imageWriter.writePixel(j, i, rayTracer.traceRay(ray));
+            }
+        }
+    }
+
+    /**
+     *Function printGrid is used for coloring the grid of the image
+     * @param interval - the width of each square in the grid
+     * @param color - the color of the grid lines'
+     * @throws MissingResourceException
+     */
+    public void printGrid(int interval, Color color) throws MissingResourceException{
+        if(imageWriter == null)
+            throw new MissingResourceException("Can't print grid, because there isn't producer to the picture", "Camera", "lack of imageWriter");
+
+        int nX = imageWriter.getNx();
+        int nY = imageWriter.getNy();
+        for (int i = 0; i < nY; i++) {
+            for(int j = 0; j < nX; j++){
+                if(i % interval == 0 || j % interval == 0)
+                    imageWriter.writePixel(j, i, color);
+            }
+        }
+    }
+
+    /**
+     * Function writeToImage is used for producing the picture
+     * @throws MissingResourceException
+     */
+    public void writeToImage() throws MissingResourceException{
+        if(imageWriter == null)
+            throw new MissingResourceException("Can't write to image, because of lack of producer to the picture", "Camera", "lack of imageWriter");
+        this.imageWriter.writeToImage();
+    }
+
+
+
+
 }

@@ -22,7 +22,7 @@ public class Double3 {
      * @param d2 second number value
      * @param d3 third number value
      */
-    protected Double3(double d1, double d2, double d3) {
+    public Double3(double d1, double d2, double d3) {
         this.d1 = d1;
         this.d2 = d2;
         this.d3 = d3;
@@ -39,6 +39,7 @@ public class Double3 {
     public double getD3() {
         return d3;
     }
+
 
     @Override
     public boolean equals(Object obj) {
