@@ -126,10 +126,11 @@ public class Camera {
     /**
      * Function renderImage is used for constructing a rays through each pixel
      * in the view plane and coloring the pixels of the image accordingly.
+     * @return Camera
      * @throws MissingResourceException
      * @throws UnsupportedOperationException
      */
-    public void renderImage() throws MissingResourceException, UnsupportedOperationException {
+    public Camera renderImage() throws MissingResourceException, UnsupportedOperationException {
         if(p0 == null || vTo == null || vUp == null || imageWriter == null || rayTracer == null )
             throw new MissingResourceException("Can't render image because of lack of resources", "Camera", "");
 
@@ -142,6 +143,8 @@ public class Camera {
                 imageWriter.writePixel(j, i, rayTracer.traceRay(ray));
             }
         }
+
+        return this;
     }
 
     /**

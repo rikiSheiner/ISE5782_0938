@@ -9,7 +9,7 @@ import java.util.List;
  * Plane class represents two-dimensional infinite surface in 3D Cartesian coordinate
  * @author Rivka Sheiner
  */
-public class Plane implements Geometry {
+public class Plane extends Geometry {
     /**
      * The reference point of the plane
      */
@@ -74,8 +74,9 @@ public class Plane implements Geometry {
         return this.normal;
     }
 
+
     @Override
-    public List<Point> findIntersections(Ray ray){
+    protected List<GeoPoint> findGeoIntersectionsHelper(Ray ray) {
         if(this.q0.equals(ray.getP0()))
             return null;
 
@@ -91,6 +92,6 @@ public class Plane implements Geometry {
 
         List<Point> points = new LinkedList<>();
         points.add(ray.getPoint(t));
-        return points;
+        return List.of(new GeoPoint(this, points.get(0)));
     }
 }

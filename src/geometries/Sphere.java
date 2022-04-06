@@ -1,16 +1,16 @@
 package geometries;
 
 import primitives.*;
+import primitives.Vector;
 
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 
 /**
  * Sphere class represents a geometrical object which is the set of points
  * that are all at the same distance from a given point in 3D space.
  * @author Rivka Sheiner
  */
-public class Sphere implements Geometry{
+public class Sphere extends Geometry{
     /**
      * the center point of the sphere
      */
@@ -52,7 +52,8 @@ public class Sphere implements Geometry{
     }
 
     @Override
-    public List<Point> findIntersections(Ray ray){
+    protected List<GeoPoint> findGeoIntersectionsHelper(Ray ray) {
+
         Vector u = this.center.subtract(ray.getP0());
         double tm = ray.getDir().dotProduct(u);
         double d = Math.sqrt(u.lengthSquared()-tm*tm);
@@ -72,10 +73,15 @@ public class Sphere implements Geometry{
             if(ray.getDir().dotProduct(ray.getPoint(t2).subtract(this.center)) != 0)
                 points.add(ray.getPoint(t2));
 
-        if(points.size() > 0 )
-            return points;
-        return null;
+        List<GeoPoint> geoPoints = new LinkedList<GeoPoint>();
+        if(points.size() > 0 ){
+            for(int i = 0; i < points.size(); i++){
+                geoPoints.add(new GeoPoint(this,points.get(i)));
+            }
+            return geoPoints;
+        }
 
+        return null;
 
     }
 }

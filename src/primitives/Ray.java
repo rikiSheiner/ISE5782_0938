@@ -1,6 +1,7 @@
 package primitives;
 
 import java.util.List;
+import geometries.Intersectable.GeoPoint;
 
 /**
  * Ray class represents ש line drawn from a certain point to infinity in only one direction
@@ -75,21 +76,33 @@ public class Ray {
      * @param points - List of Point
      * @return Point - the closest point to the head of the ray
      */
-    public Point findClosestPoint(List<Point> points){
-        if(points == null || points.size() == 0)
+    public Point findClosestPoint(List<Point> points) {
+        return points == null || points.isEmpty() ? null
+                : findClosestGeoPoint(points.stream().map(p -> new GeoPoint(null, p)).toList()).point;
+    }
+
+
+    /**
+     * Function findGeoClosestPoint finds the GeoPoint with the minimal
+     * @param intersections - List of Point
+     * @return GeoPoint - the closest GeoPoint to the head of the ray
+     */
+    public GeoPoint findClosestGeoPoint(List<GeoPoint> intersections) {
+        if(intersections == null || intersections.size() == 0)
             return null;
 
-        Point closestPoint = points.get(0);
-        double minDistance = this.p0.distanceSquared(closestPoint);
+        GeoPoint closestPoint = intersections.get(0);
+        double minDistance = this.p0.distanceSquared(closestPoint.point);
         double tempDistance = 0;
-        for(int i = 1; i < points.size(); i++){
-            tempDistance = this.p0.distanceSquared(points.get(i));
+        for(int i = 1; i < intersections.size(); i++){
+            tempDistance = this.p0.distanceSquared(intersections.get(i).point);
             if(tempDistance < minDistance){
-                closestPoint = points.get(i);
+                closestPoint = intersections.get(i);
                 minDistance = tempDistance;
             }
         }
         return closestPoint;
     }
+
 
 }

@@ -12,6 +12,11 @@ public class Point {
      */
     final Double3 xyz;
     /**
+     * Zero point(0,0,0)
+     */
+    public static final Point ZERO = new Point(0, 0, 0);
+
+    /**
     * Point constructor based on 3 coordinates.
      * @param x, y, z - the 3 coordinates of the point 3D
     * */

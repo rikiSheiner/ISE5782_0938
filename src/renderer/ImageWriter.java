@@ -68,6 +68,11 @@ public class ImageWriter {
      * Function writeToImage produces unoptimized png file of the image according to
      * pixel color matrix in the directory of the project
      */
+    /**
+     * Function writeToImage produces unoptimized png file of the image according to
+     * pixel color matrix in the directory of the project
+     * @return ImageWriter
+     */
     public void writeToImage() {
         try {
             File file = new File(FOLDER_PATH + '/' + imageName + ".png");
@@ -76,6 +81,7 @@ public class ImageWriter {
             logger.log(Level.SEVERE, "I/O error", e);
             throw new IllegalStateException("I/O error - may be missing directory " + FOLDER_PATH, e);
         }
+
     }
 
     /**

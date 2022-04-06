@@ -3,6 +3,10 @@ package scene;
 import lighting.AmbientLight;
 import primitives.*;
 import geometries.*;
+import lighting.*;
+
+import java.util.LinkedList;
+import java.util.List;
 
 public class Scene {
 
@@ -22,6 +26,11 @@ public class Scene {
      * The geometry shapes in the 3D model of the scene
      */
     public Geometries geometries;
+    /**
+     * List of the light sources in the scene
+     */
+    public List<LightSource> lights;
+
 
     /**
      * Scene parameters constructor
@@ -34,6 +43,7 @@ public class Scene {
         this.background = Color.BLACK;
         this.ambientLight = new AmbientLight();
         this.geometries = new Geometries();
+        this.lights = new LinkedList<>();
     }
 
     /**
@@ -63,6 +73,16 @@ public class Scene {
      */
     public Scene setGeometries(Geometries geometries) {
         this.geometries = geometries;
+        return this;
+    }
+
+    /**
+     * This method is used for updating the light sources in the scene
+     * @param lights - list of light sources
+     * @return Scene
+     */
+    public Scene setLights(List<LightSource> lights) {
+        this.lights = lights;
         return this;
     }
 }

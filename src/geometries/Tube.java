@@ -9,7 +9,7 @@ import java.util.List;
  *that are all at the same distance from the axis
  * @author Rivka Sheiner
  */
-public class Tube implements Geometry{
+public class Tube extends Geometry{
     /**
      * the straight line in the center of the tube
      */
@@ -58,8 +58,10 @@ public class Tube implements Geometry{
         return p.subtract(o).normalize();
     }
 
+
     @Override
-    public List<Point> findIntersections(Ray ray){
+    protected List<GeoPoint> findGeoIntersectionsHelper(Ray ray) {
         return null;
     }
+
 }

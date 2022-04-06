@@ -10,7 +10,7 @@ import java.util.List;
  * Geometries class represents a collection of geometric shapes
  * @author Rivka Sheiner
  */
-public class Geometries implements Intersectable{
+public class Geometries extends Intersectable{
 
     /**
      * The list of the geometric shapes
@@ -43,14 +43,14 @@ public class Geometries implements Intersectable{
     }
 
     @Override
-    public List<Point> findIntersections(Ray ray){
-        List<Point> allPoints = new LinkedList<>();
-        List<Point> points;
+    protected List<GeoPoint> findGeoIntersectionsHelper(Ray ray) {
+        List<GeoPoint> allPoints = new LinkedList<>();
+        List<GeoPoint> points;
         int counter = 0;
         for(Intersectable geo : geometries){
-            points = geo.findIntersections(ray);
+            points = geo.findGeoIntersections(ray);
             if(points != null)
-                for(Point p : points){
+                for(GeoPoint p : points){
                     allPoints.add(p);
                     counter++;
                 }
@@ -59,5 +59,6 @@ public class Geometries implements Intersectable{
         if(allPoints == null || counter == 0)
             return null;
         return allPoints;
+
     }
 }

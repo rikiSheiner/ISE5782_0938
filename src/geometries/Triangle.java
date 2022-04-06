@@ -20,38 +20,37 @@ public class Triangle extends Polygon {
     }
 
     @Override
-    public List<Point> findIntersections(Ray ray){
-        List<Point> points = this.plane.findIntersections(ray);
+    protected List<GeoPoint> findGeoIntersectionsHelper(Ray ray) {
+        List<GeoPoint> points = this.plane.findGeoIntersections(ray);
         if(points == null)
             return null;
 
-        Point p = points.get(0); // the intersection point with the plane of the triangle
+        GeoPoint p = points.get(0); // the intersection point with the plane of the triangle
 
         try{
             //edge 0
             Vector c = new Vector(1,1,1);
             Vector edge0 = this.vertices.get(1).subtract(this.vertices.get(0));
-            Vector vp0 = p.subtract(this.vertices.get(0));
+            Vector vp0 = p.point.subtract(this.vertices.get(0));
             c = edge0.crossProduct(vp0);
             if(this.plane.getNormal().dotProduct(c) < 0) return null; //p is on the right side
 
             //edge 1
             Vector edge1 = this.vertices.get(2).subtract(this.vertices.get(1));
-            Vector vp1 = p.subtract(this.vertices.get(1));
+            Vector vp1 = p.point.subtract(this.vertices.get(1));
             c = edge1.crossProduct(vp1);
             if(this.plane.getNormal().dotProduct(c) < 0) return null; //p is on the right side
 
             //edge 2
             Vector edge2 = this.vertices.get(0).subtract(this.vertices.get(2));
-            Vector vp2 = p.subtract(this.vertices.get(2));
+            Vector vp2 = p.point.subtract(this.vertices.get(2));
             c = edge2.crossProduct(vp2);
             if(this.plane.getNormal().dotProduct(c) < 0) return null; //p is on the right side
 
-            return points;
+            return List.of(new GeoPoint(this, points.get(0).point));
         }
         catch(IllegalArgumentException ie){
             return null;
         }
-
     }
 }

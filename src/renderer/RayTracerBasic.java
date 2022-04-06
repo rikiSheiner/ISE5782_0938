@@ -2,8 +2,12 @@ package renderer;
 
 import primitives.*;
 import scene.Scene;
+import geometries.Intersectable.GeoPoint;
+import lighting.*;
 
 import java.util.List;
+
+import static primitives.Util.alignZero;
 
 /**
  * RayTracerBasic class responsible for basic tracing on the rays which
@@ -27,20 +31,82 @@ public class RayTracerBasic extends RayTracerBase{
      * @return Color
      */
     public Color traceRay(Ray ray) {
-        List<Point> intersections = scene.geometries.findIntersections(ray);
-        if(intersections == null || intersections.size() == 0)
-            return scene.background;
-        Point closestPoint = ray.findClosestPoint(intersections);
-        return calcColor(closestPoint);
+        List<GeoPoint> intersections = scene.geometries.findGeoIntersections(ray);
+        if (intersections == null) return scene.background;
+        GeoPoint closestPoint = ray.findClosestGeoPoint(intersections);
+        return calcColor(closestPoint, ray);
     }
 
     /**
      * Function calcColor is used for calculating the color of specific
-     * point in the scene.
-     * @param point
-     * @return Color - the color of this point
+     * @param gp - the geometry point
+     * @param ray - the ray which intersects the geometric body in the point gp
+     * @return Color - the color of this geometry point
      */
-    private Color calcColor(Point point) {
-        return scene.ambientLight.getIntensity();
+    private Color calcColor(GeoPoint gp, Ray ray) {
+        return scene.ambientLight.getIntensity()
+                .add(gp.geometry.getEmission())
+                .add(calcLocalEffects(gp, ray));
     }
+
+    /**
+     * Function calcLocalEffects calculates the contribution of the light
+     * sources in the scene to the color of specific intersection point.
+     * @param intersection - the intersection point of the ray with the geometric body
+     * @param ray - the ray which intersect the geometric body
+     * @return Color - the total contribution of all the light sources
+     */
+    private Color calcLocalEffects(GeoPoint intersection, Ray ray) {
+        Vector v = ray.getDir();
+        Vector n = intersection.geometry.getNormal(intersection.point);
+        double nv = alignZero(n.dotProduct(v));
+        if (nv == 0) return Color.BLACK;
+        int nShininess = intersection.geometry.getMaterial().nShininess;
+        double kd = intersection.geometry.getMaterial().kD.getD1();
+        double ks = intersection.geometry.getMaterial().kS.getD1();
+        Color color = Color.BLACK;
+        for (LightSource lightSource : scene.lights) {
+            Vector l = lightSource.getL(intersection.point);
+            double nl = alignZero(n.dotProduct(l));
+            if (nl * nv > 0) { // sign(nl) == sing(nv)
+                Color lightIntensity = lightSource.getIntensity(intersection.point);
+                color = color.add(calcDiffusive(kd, l, n, lightIntensity),
+                        calcSpecular(ks, l, n, v, nShininess, lightIntensity));
+            }
+        }
+        return color;
+    }
+
+    /**
+     * Function calcSpecular calculates the specular lighting of the body under the
+     * influence of the light source.
+     * @param ks - coefficient of decay of the material
+     * @param l - vector from the light source to the point on the geometric body
+     * @param n - the normal vector to the geometric body in the intersection point
+     * @param v - the direction vector of the ray which intersects the geometric body
+     * @param nShininess - the size of shininess of the geometric body's material
+     * @param lightIntensity - the intensity of the external light source
+     * @return Color
+     */
+    private Color calcSpecular(double ks, Vector l, Vector n, Vector v, int nShininess, Color lightIntensity) {
+        Vector r = l.subtract(n.scale(2*l.dotProduct(n)));
+        double factor = ks * Math.pow(Math.max(0, -v.dotProduct(r)), nShininess);
+        return lightIntensity.scale(factor);
+    }
+
+    /**
+     * Function calcDiffusive calculates the diffuse illumination across the geometric
+     * body under the influence of the light source.
+     * @param kd - coefficient of decay of the material
+     * @param l - vector from the light source to the point on the geometric body
+     * @param n - the normal vector to the geometric body in the intersection point
+     * @param lightIntensity - the intensity of the external light source
+     * @return Color
+     */
+    private Color calcDiffusive(double kd, Vector l, Vector n, Color lightIntensity) {
+        double factor = kd * Math.abs(l.dotProduct(n));
+        return lightIntensity.scale(factor);
+    }
+
+
 }
