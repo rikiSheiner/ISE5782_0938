@@ -12,15 +12,15 @@ public class PointLight extends Light implements LightSource{
      */
     private Point position;
     /**
-     * Fading coefficient of the point light, depending on distance.
+     * Factor of attenuation with distance of the point light.
      */
     private double kC;
     /**
-     * Fading coefficient of the point light, depending on distance.
+     * Factor of attenuation with distance of the point light.
      */
     private double kL;
     /**
-     *Fading coefficient of the point light, depending on distance.
+     * Factor of attenuation with distance of the point light.
      */
     private double kQ;
 
@@ -39,7 +39,7 @@ public class PointLight extends Light implements LightSource{
 
     /**
      * This method is used for updating the fading coefficient - kC - of the point light
-     * @param kC - the fading coefficient for updating
+     * @param kC - Factor of attenuation with distance for updating
      * @return PointLight
      */
     public PointLight setKc(double kC) {
@@ -49,7 +49,7 @@ public class PointLight extends Light implements LightSource{
 
     /**
      * This method is used for updating the fading coefficient - kL - of the point light
-     * @param kL - the fading coefficient for updating
+     * @param kL - Factor of attenuation with distance for updating
      * @return PointLight
      */
     public PointLight setKl(double kL) {
@@ -59,7 +59,7 @@ public class PointLight extends Light implements LightSource{
 
     /**
      * This method is used for updating the fading coefficient - kQ - of the point light
-     * @param kQ - the fading coefficient for updating
+     * @param kQ - Factor of attenuation with distance for updating
      * @return PointLight
      */
     public PointLight setKq(double kQ) {
@@ -69,12 +69,12 @@ public class PointLight extends Light implements LightSource{
 
     @Override
     public Color getIntensity(Point p){
-        double d = position.distance(p);
+        double d = p.distance(position);
         double temp = kC+kL*d+kQ*d*d;
         return getIntensity().reduce(temp);
     }
     @Override
     public Vector getL(Point p){
-        return p.subtract(position);
+        return position.subtract(p);
     }
 }

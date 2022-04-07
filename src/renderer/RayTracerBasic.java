@@ -80,7 +80,7 @@ public class RayTracerBasic extends RayTracerBase{
     /**
      * Function calcSpecular calculates the specular lighting of the body under the
      * influence of the light source.
-     * @param ks - coefficient of decay of the material
+     * @param ks - factor of attenuation of the material
      * @param l - vector from the light source to the point on the geometric body
      * @param n - the normal vector to the geometric body in the intersection point
      * @param v - the direction vector of the ray which intersects the geometric body
@@ -89,22 +89,26 @@ public class RayTracerBasic extends RayTracerBase{
      * @return Color
      */
     private Color calcSpecular(double ks, Vector l, Vector n, Vector v, int nShininess, Color lightIntensity) {
-        Vector r = l.subtract(n.scale(2*l.dotProduct(n)));
-        double factor = ks * Math.pow(Math.max(0, -v.dotProduct(r)), nShininess);
+
+        Vector lNormalized = l.normalize();
+        Vector nNormalized = n.normalize();
+
+        Vector r = lNormalized.subtract(nNormalized.scale(2*lNormalized.dotProduct(nNormalized)));
+        double factor = ks * Math.pow(Math.max(0, -v.normalize().dotProduct(r.normalize())), nShininess);
         return lightIntensity.scale(factor);
     }
 
     /**
      * Function calcDiffusive calculates the diffuse illumination across the geometric
      * body under the influence of the light source.
-     * @param kd - coefficient of decay of the material
+     * @param kd - factor of attenuation of the material
      * @param l - vector from the light source to the point on the geometric body
      * @param n - the normal vector to the geometric body in the intersection point
      * @param lightIntensity - the intensity of the external light source
      * @return Color
      */
     private Color calcDiffusive(double kd, Vector l, Vector n, Color lightIntensity) {
-        double factor = kd * Math.abs(l.dotProduct(n));
+        double factor = kd * Math.abs(l.normalize().dotProduct(n.normalize()));
         return lightIntensity.scale(factor);
     }
 

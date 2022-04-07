@@ -92,13 +92,13 @@ public class Ray {
             return null;
 
         GeoPoint closestPoint = intersections.get(0);
-        double minDistance = this.p0.distanceSquared(closestPoint.point);
-        double tempDistance = 0;
+        double minDistanceSquared = this.p0.distanceSquared(closestPoint.point);
+        double tempDistanceSquared = 0;
         for(int i = 1; i < intersections.size(); i++){
-            tempDistance = this.p0.distanceSquared(intersections.get(i).point);
-            if(tempDistance < minDistance){
+            tempDistanceSquared = this.p0.distanceSquared(intersections.get(i).point);
+            if(tempDistanceSquared < minDistanceSquared){
                 closestPoint = intersections.get(i);
-                minDistance = tempDistance;
+                minDistanceSquared = tempDistanceSquared;
             }
         }
         return closestPoint;

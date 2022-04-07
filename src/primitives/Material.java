@@ -5,15 +5,15 @@ package primitives;
  */
 public class Material {
     /**
-     *
+     * Factor of attenuation of the material
      */
     public Double3 kD = Double3.ZERO;
     /**
-     *
+     * Factor of attenuation of the material
      */
     public Double3 kS = Double3.ZERO;
     /**
-     *
+     * The size of shininess of the material
      */
     public int nShininess = 0;
 
