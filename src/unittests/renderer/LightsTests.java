@@ -100,7 +100,7 @@ public class LightsTests {
         Color color = new Color(0,200,5);
 
         scene1.geometries.add(sphere);
-        scene1.lights.add(new SpotLight(color, positionSL, new Vector(1, 1, -0.5)).setKl(0.001).setKq(0.0001));
+        scene1.lights.add(new SpotLight(color, positionSL, new Vector(1, 1, -0.5)).setKl(0.007).setKq(0.0001));
         scene1.lights.add(new PointLight(color, positionPL).setKl(0.0005).setKq(0.001));
         scene1.lights.add(new DirectionalLight(color, new Vector(-1, -2, 0.5)));
 
