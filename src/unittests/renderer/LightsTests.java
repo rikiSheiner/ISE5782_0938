@@ -18,6 +18,8 @@ public class LightsTests {
     private Scene scene1 = new Scene("Test scene");
     private Scene scene2 = new Scene("Test scene") //
             .setAmbientLight(new AmbientLight(new Color(WHITE), new Double3(0.15)));
+    private Scene scene3 = new Scene("Test scene");
+
     private Camera camera1 = new Camera(new Point(0, 0, 1000), new Vector(0, 0, -1), new Vector(0, 1, 0)) //
             .setVPSize(150, 150) //
             .setVPDistance(1000);
@@ -73,7 +75,7 @@ public class LightsTests {
     }
 
     /**
-     * Produce a picture of a sphere lighted by a spot light
+     * Produce a picture of a sphere lighted by a spotlight
      */
     @Test
     public void sphereSpot() {
@@ -88,7 +90,30 @@ public class LightsTests {
     }
 
     /**
-     * Produce a picture of a two triangles lighted by a directional light
+     * Produce a picture of a sphere lighted by multiple light sources
+     */
+    @Test
+    public void sphereMultiLightSources(){
+
+        Point positionPL = new Point(50,-30,-20);
+        Point positionSL = new Point(-40,-50,-7);
+        Color color = new Color(0,200,5);
+
+        scene1.geometries.add(sphere);
+        scene1.lights.add(new SpotLight(color, positionSL, new Vector(1, 1, -0.5)).setKl(0.001).setKq(0.0001));
+        scene1.lights.add(new PointLight(color, positionPL).setKl(0.0005).setKq(0.001));
+        scene1.lights.add(new DirectionalLight(color, new Vector(-1, -2, 0.5)));
+
+        ImageWriter imageWriter = new ImageWriter("lightSphereMulti", 500, 500);
+        camera1.setImageWriter(imageWriter) //
+                .setRayTracer(new RayTracerBasic(scene1)) //
+                .renderImage() //
+                .writeToImage(); //
+    }
+
+
+    /**
+     * Produce a picture of two triangles lighted by a directional light
      */
     @Test
     public void trianglesDirectional() {
@@ -103,7 +128,7 @@ public class LightsTests {
     }
 
     /**
-     * Produce a picture of a two triangles lighted by a point light
+     * Produce a picture of two triangles lighted by a point light
      */
     @Test
     public void trianglesPoint() {
@@ -131,5 +156,28 @@ public class LightsTests {
                 .renderImage() //
                 .writeToImage(); //
     }
+
+    /**
+     * Produce a picture of two triangles lighted by multiple light sources
+     */
+    @Test
+    public void trianglesMultiLightSources(){
+        Point positionPL = new Point(40,20,-100);
+        Point positionSL = new Point(30,-55,-50);
+        Color color = new Color(230,100,200);
+
+        scene2.geometries.add(triangle1, triangle2);
+        scene2.lights.add(new SpotLight(color, positionSL, new Vector(1, 1, -0.5)).setKl(0.005).setKq(0.00001));
+        scene2.lights.add(new PointLight(color, positionPL).setKl(0.002).setKq(0.0009));
+        scene2.lights.add(new DirectionalLight(color, new Vector(-1, 0.5, -0.5)));
+
+        ImageWriter imageWriter = new ImageWriter("lightTrianglesMulti", 500, 500);
+        camera2.setImageWriter(imageWriter) //
+                .setRayTracer(new RayTracerBasic(scene2)) //
+                .renderImage() //
+                .writeToImage(); //
+    }
+
+
 
 }
