@@ -128,5 +128,27 @@ public class SphereTests {
 
     }
 
+    /**
+     * Test method for {@link geometries.Sphere#findGeoIntersections(primitives.Ray,double)}.
+     */
+    @Test
+    void testFindIntersectionsWithDistance() {
+        Sphere sphere = new Sphere(new Point(1, 0, 0), 1d);
+        List<Intersectable.GeoPoint> result;
+        Point p1;
 
+        // ============ Equivalence Partitions Tests ==============
+
+        //TC01: The point of intersection is more than max distance (0 points)
+        result = sphere.findGeoIntersections(new Ray(new Point(1.1,0,0),
+                new Vector(2,0,0)),0.1);
+        assertNull(result,"Ray does not intersect the sphere in the limited distance");
+
+        //TC02: The point of intersection is less than max distance (1 point)
+        p1 = new Point(2,0,0);
+        result = sphere.findGeoIntersections(new Ray(new Point(1.1,0,0),
+                new Vector(2,0,0)),5);
+        assertEquals(p1, result.get(0).point,"Ray intersects the sphere in the limited distance");
+
+    }
 }

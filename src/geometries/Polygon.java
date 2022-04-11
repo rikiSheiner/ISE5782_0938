@@ -93,14 +93,95 @@ public class Polygon extends Geometry {
 
     @Override
     protected List<GeoPoint> findGeoIntersectionsHelper(Ray ray) {
-        List<GeoPoint> intersectionsPlane = plane.findGeoIntersections(ray);
-        List<GeoPoint> intersectionsPolygon = new LinkedList<GeoPoint>();
+        List<GeoPoint> intersectionsPolygon = plane.findGeoIntersections(ray);
+        if(intersectionsPolygon == null || intersectionsPolygon.size() == 0)
+            return null;
 
-        //check on each point in the list if it is into the polygon
+        Point answer = intersectionsPolygon.get(0).point;
 
+        //check if the intersection point is into the polygon
+        Vector test_line = answer.subtract(this.vertices.get(0));
+        Vector test_axis = this.plane.getNormal().crossProduct(test_line);
 
+        boolean point_is_inside = false;
 
+        Vector test_point = this.vertices.get(1).subtract(answer);
+        boolean prev_point_ahead = test_line.dotProduct(test_point) > 0;
+        boolean prev_point_above = test_axis.dotProduct(test_point) > 0;
+
+        boolean this_point_ahead = false;
+        boolean this_point_above = false;
+
+        int index = 2;
+        while(index < this.vertices.size())
+        {
+            test_point = this.vertices.get(index).subtract(answer);
+            this_point_ahead = test_line.dotProduct(test_point) > 0;
+
+            if (prev_point_ahead || this_point_ahead)
+            {
+                this_point_above = test_axis.dotProduct(test_point) > 0;
+
+                if ((!prev_point_above && this_point_above) || (prev_point_above && !this_point_above))
+                {
+                    point_is_inside = !point_is_inside;
+                }
+            }
+
+            prev_point_ahead = this_point_ahead;
+            prev_point_above = this_point_above;
+            index++;
+        }
+
+        if(point_is_inside)
+            return intersectionsPolygon;
+        return null;
+    }
+
+    @Override
+    protected List<GeoPoint> findGeoIntersectionsHelper(Ray ray, double maxDistance) {
+        List<GeoPoint> intersectionsPolygon = plane.findGeoIntersections(ray);
+        if(intersectionsPolygon == null || intersectionsPolygon.size() == 0)
+            return null;
+
+        Point answer = intersectionsPolygon.get(0).point;
+
+        //check if the intersection point is into the polygon
+        Vector test_line = answer.subtract(this.vertices.get(0));
+        Vector test_axis = this.plane.getNormal().crossProduct(test_line);
+
+        boolean point_is_inside = false;
+
+        Vector test_point = this.vertices.get(1).subtract(answer);
+        boolean prev_point_ahead = test_line.dotProduct(test_point) > 0;
+        boolean prev_point_above = test_axis.dotProduct(test_point) > 0;
+
+        boolean this_point_ahead = false;
+        boolean this_point_above = false;
+
+        int index = 2;
+        while(index < this.vertices.size())
+        {
+            test_point = this.vertices.get(index).subtract(answer);
+            this_point_ahead = test_line.dotProduct(test_point) > 0;
+
+            if (prev_point_ahead || this_point_ahead)
+            {
+                this_point_above = test_axis.dotProduct(test_point) > 0;
+
+                if ((!prev_point_above && this_point_above) || (prev_point_above && !this_point_above))
+                {
+                    point_is_inside = !point_is_inside;
+                }
+            }
+
+            prev_point_ahead = this_point_ahead;
+            prev_point_above = this_point_above;
+            index++;
+        }
+
+        if(point_is_inside && intersectionsPolygon.get(0).point.distance(ray.getP0()) <= maxDistance)
+            return intersectionsPolygon;
         return null;
     }
 }
-

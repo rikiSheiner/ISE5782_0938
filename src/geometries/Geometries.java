@@ -61,4 +61,32 @@ public class Geometries extends Intersectable{
         return allPoints;
 
     }
+
+    /**
+     * This method is used for finding the intersections points of ray with geometries
+     * @param ray- the ray imposed on the geometric shape
+     * @param maxDistance - the max distance between the intersection point to the ray's head
+     * @return List of GeoPoint
+     */
+    @Override
+    protected List<GeoPoint> findGeoIntersectionsHelper(Ray ray, double maxDistance){
+        List<GeoPoint> allPoints = new LinkedList<>();
+        List<GeoPoint> points;
+        int counter = 0;
+        for(Intersectable geo : geometries){
+            points = geo.findGeoIntersections(ray);
+            if(points != null)
+                for(GeoPoint p : points){
+                    if(p.point.distance(ray.getP0()) <= maxDistance){
+                        allPoints.add(p);
+                        counter++;
+                    }
+                }
+        }
+
+        if(allPoints == null || counter == 0)
+            return null;
+        return allPoints;
+    }
+
 }

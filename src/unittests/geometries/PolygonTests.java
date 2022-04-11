@@ -6,6 +6,8 @@ import org.junit.jupiter.api.Test;
 import geometries.*;
 import primitives.*;
 
+import java.util.List;
+
 /**
  * Testing Polygons
  * @author Dan
@@ -78,5 +80,41 @@ public class PolygonTests {
      */
     @Test
     public void testFindIntersections() {
+        Polygon poly = new Polygon(new Point(1,0,0),new Point(0,1,0),new Point(-1,0,0),new Point(0,-1,0));
+        List<Point> result;
+        Point p;
+
+        // ============ Equivalence Partitions Tests ==============
+
+        // TC01: Ray does not intersect the polygon (0 points)
+        result = poly.findIntersections(new Ray(new Point(0,0.5,1), new Vector(0,0,1)));
+        assertNull(result,"Ray does not intersect the polygon");
+
+        //TC02: Ray intersects the polygon (1 point)
+        result = poly.findIntersections(new Ray(new Point(0,0.5,-1), new Vector(0,0,1)));
+        p = new Point(0,0.5,0);
+        assertEquals(List.of(p),result,"Ray crosses the polygon");
+    }
+
+    /**
+     * Test method for {@link geometries.Polygon#findGeoIntersections(primitives.Ray,double)}.
+     */
+    @Test
+    void testFindIntersectionsWithDistance() {
+        Polygon poly = new Polygon(new Point(1,0,0),new Point(0,1,0),new Point(-1,0,0),new Point(0,-1,0));
+        List<Intersectable.GeoPoint> result;
+        Point p;
+
+        // ============ Equivalence Partitions Tests ==============
+
+        //TC01: The point of intersection is more than max distance (0 points)
+        result = poly.findGeoIntersections(new Ray(new Point(0,0.5,-1), new Vector(0,0,1)),0.1);
+        assertNull(result,"Ray does not intersect the polygon in the limited distance");
+
+        //TC02: The point of intersection is less than max distance (1 point)
+        result = poly.findGeoIntersections(new Ray(new Point(0,0.5,-1), new Vector(0,0,1)),5);
+        p = new Point(0,0.5,0);
+        assertEquals(p, result.get(0).point,"Ray intersects the polygon in the limited distance");
+
     }
 }

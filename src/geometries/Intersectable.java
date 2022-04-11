@@ -19,17 +19,40 @@ public abstract class Intersectable {
                 : geoList.stream().map(gp -> gp.point).toList();
     }
 
-
-    public List<GeoPoint> findGeoIntersections(Ray ray){
-        return findGeoIntersectionsHelper(ray);
-    }
-
     /**
      * The method finds the intersection geo points of the geometry with the ray
      * @param ray - the ray imposed on the geometric shape
      * @return List of GeoPoint - the intersection geo points with the ray
      */
-    protected abstract List<GeoPoint> findGeoIntersectionsHelper(Ray ray);
+     protected abstract List<GeoPoint> findGeoIntersectionsHelper(Ray ray);
+
+    /**
+     * The method finds the geometric intersection points of the geometry with the ray
+     * @param ray - the ray imposed on the geometric shape
+     * @return List of GeoPoint - the intersection geometric points with the ray
+     */
+    public final List<GeoPoint> findGeoIntersections(Ray ray) {
+        return findGeoIntersections(ray, Double.POSITIVE_INFINITY);
+    }
+
+    /**
+     * The method finds the intersection geo points of the geometry with the ray,
+     * only the points that are not far away from the ray more than max distance.
+     * @param ray - the ray imposed on the geometric shape
+     * @param maxDistance - the max distance between the intersection point to the ray
+     * @return List of GeoPoint - the intersection geo points with the ray
+     */
+    public final List<GeoPoint> findGeoIntersections(Ray ray, double maxDistance) {
+        return findGeoIntersectionsHelper(ray, maxDistance);
+    }
+
+    /**
+     * The method helps to find the intersection geo points of the geometry with the ray.
+     * @param ray- the ray imposed on the geometric shape
+     * @param maxDistance - the max distance between the intersection point to the ray's head
+     * @return List of GeoPoint - the intersection geo points with the ray
+     */
+    protected abstract List<GeoPoint> findGeoIntersectionsHelper(Ray ray, double maxDistance);
 
 
     /**

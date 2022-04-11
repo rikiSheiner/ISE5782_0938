@@ -73,8 +73,14 @@ public class PointLight extends Light implements LightSource{
         double temp = kC+kL*d+kQ*d*d;
         return getIntensity().reduce(temp);
     }
+
     @Override
     public Vector getL(Point p){
         return p.subtract(position);
+    }
+
+    @Override
+    public double getDistance(Point point){
+        return position.distance(point);
     }
 }

@@ -20,4 +20,11 @@ public interface LightSource {
      * @return Vector
      */
     public Vector getL(Point p);
+
+    /**
+     * This function is used for calculating the distance from the light source to the point
+     * @param point - the point on the geometric body
+     * @return double
+     */
+    double getDistance(Point point);
 }

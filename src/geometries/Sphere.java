@@ -84,4 +84,48 @@ public class Sphere extends Geometry{
         return null;
 
     }
+
+    /**
+     * This method is used for finding the intersections points of ray with sphere
+     * @param ray- the ray imposed on the geometric shape
+     * @param maxDistance - the max distance between the intersection point to the ray's head
+     * @return List of GeoPoint
+     */
+    @Override
+    protected List<GeoPoint> findGeoIntersectionsHelper(Ray ray, double maxDistance){
+        Vector u = this.center.subtract(ray.getP0());
+        double tm = ray.getDir().dotProduct(u);
+        double d = Math.sqrt(u.lengthSquared()-tm*tm);
+        double th = Math.sqrt(this.radius*this.radius - d*d);
+        double t1 = tm + th;
+        double t2 = tm - th;
+        boolean t1gz = t1 > 0, t2gz = t2 > 0;
+
+        if(!t1gz && !t2gz)
+            return null;
+
+        List<Point> points = new LinkedList<>();
+        if(t1gz)
+            if(ray.getDir().dotProduct(ray.getPoint(t1).subtract(this.center)) != 0)
+                points.add(ray.getPoint(t1));
+        if(t2gz)
+            if(ray.getDir().dotProduct(ray.getPoint(t2).subtract(this.center)) != 0)
+                points.add(ray.getPoint(t2));
+
+        List<GeoPoint> geoPoints = new LinkedList<GeoPoint>();
+        int counter = 0;
+        if(points.size() > 0 ){
+            for(int i = 0; i < points.size(); i++){
+                if(points.get(i).distance(ray.getP0()) <= maxDistance){
+                    geoPoints.add(new GeoPoint(this,points.get(i)));
+                    counter++;
+                }
+            }
+            if(counter > 0)
+                return geoPoints;
+        }
+
+        return null;
+
+    }
 }

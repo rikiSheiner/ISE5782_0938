@@ -94,4 +94,34 @@ public class Plane extends Geometry {
         points.add(ray.getPoint(t));
         return List.of(new GeoPoint(this, points.get(0)));
     }
+
+    /**
+     * This method is used for finding the intersections points of ray with plane
+     * @param ray- the ray imposed on the geometric shape
+     * @param maxDistance - the max distance between the intersection point to the ray's head
+     * @return List of GeoPoint
+     */
+    @Override
+    protected List<GeoPoint> findGeoIntersectionsHelper(Ray ray, double maxDistance){
+        if(this.q0.equals(ray.getP0()))
+            return null;
+
+        double numerator = this.normal.dotProduct(this.q0.subtract(ray.getP0()));
+        double denominator = this.normal.dotProduct(ray.getDir());
+
+        if(Util.isZero(denominator))
+            return null;
+
+        double t = numerator / denominator;
+        if(Util.isZero(t) || t < 0)
+            return null;
+
+        List<Point> points = new LinkedList<>();
+        points.add(ray.getPoint(t));
+
+        if(points.get(0).distance(ray.getP0()) > maxDistance)
+            return null;
+
+        return List.of(new GeoPoint(this, points.get(0)));
+    }
 }

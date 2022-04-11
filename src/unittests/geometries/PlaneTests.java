@@ -112,4 +112,26 @@ public class PlaneTests {
 
     }
 
+    /**
+     * Test method for {@link geometries.Plane#findGeoIntersections(primitives.Ray,double)}.
+     */
+    @Test
+    void testFindIntersectionsWithDistance() {
+        Plane plane = new Plane(new Point(1,0,0), new Vector(0,1,0));
+        List<Intersectable.GeoPoint> result;
+        Point p1;
+
+        // ============ Equivalence Partitions Tests ==============
+
+        //TC01: The point of intersection is more than max distance (0 points)
+        result = plane.findGeoIntersections(new Ray(new Point(1,-1,0), new Vector(1,1,1)),0.1);
+        assertNull( result, "Ray does not intersect the plane in the limited distance");
+
+        //TC02: The point of intersection is less than max distance (1 point)
+        p1 = new Point(2,0,1);
+        result = plane.findGeoIntersections(new Ray(new Point(1,-1,0), new Vector(1,1,1)),5);
+        assertEquals(1, result.size(), "Wrong number of points");
+        assertEquals(p1, result.get(0).point, "Ray intersects the plane in the limited distance");
+
+    }
 }

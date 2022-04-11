@@ -28,4 +28,5 @@ public class SpotLight extends PointLight{
         double factor = Math.max(0, direction.normalize().dotProduct(getL(p).normalize()));
         return super.getIntensity(p).scale(factor);
     }
+
 }

@@ -64,4 +64,14 @@ public class Tube extends Geometry{
         return null;
     }
 
+    /**
+     * This method is used for finding the intersections points of ray with tube
+     * @param ray- the ray imposed on the geometric shape
+     * @param maxDistance - the max distance between the intersection point to the ray
+     * @return List of GeoPoint
+     */
+    @Override
+    protected List<GeoPoint> findGeoIntersectionsHelper(Ray ray, double maxDistance){
+        return null;
+    }
 }

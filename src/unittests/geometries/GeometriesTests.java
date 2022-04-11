@@ -48,4 +48,26 @@ public class GeometriesTests {
         result = geometries2.findIntersections(new Ray(new Point(2,-0.25,0), new Vector(0,1,0)));
         assertEquals(3, result.size(), "Ray crosses all geometries");
     }
+
+    /**
+     * Test method for {@link geometries.Geometries#findGeoIntersections(primitives.Ray,double)}.
+     */
+    @Test
+    void testFindIntersectionsWithDistance() {
+        Geometries geometries = new Geometries(new Plane(new Point(1,0,0), new Vector(0,0,1))
+                , new Triangle(new Point(0,0,1), new Point(5,0,1),new Point(0,0,5))
+                , new Sphere(new Point(2,0,0), 1));
+        List<Intersectable.GeoPoint> result;
+
+        // ============ Equivalence Partitions Tests ==============
+
+        //TC01: The point of intersection is more than max distance (0 points)
+        result = geometries.findGeoIntersections(new Ray(new Point(2.1,0.1,0), new Vector(0,1,0)),0.1);
+        assertNull( result, "Ray does not intersect the geometries in the limited distance");
+
+        //TC02: The point of intersection is less than max distance (1 point)
+        result = geometries.findGeoIntersections(new Ray(new Point(2.1,0.1,0), new Vector(0,1,0)),5);
+        assertEquals(1, result.size(), "Ray intersects 1 geometry in the limited distance");
+
+    }
 }
