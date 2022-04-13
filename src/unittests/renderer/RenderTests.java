@@ -32,7 +32,7 @@ public class RenderTests {
     @Test
     public void basicRenderTwoColorTest() {
         Scene scene = new Scene("Test scene")//
-                .setAmbientLight(new AmbientLight(new Color(255, 191, 191), //
+                .setAmbient(new AmbientLight(new Color(255, 191, 191), //
                         new Double3(1,1,1))) //
                 .setBackground(new Color(75, 127, 90));
 
@@ -62,7 +62,7 @@ public class RenderTests {
     @Test
     public void basicRenderMultiColorTest() {
         Scene scene = new Scene("Test scene")//
-                .setAmbientLight(new AmbientLight(new Color(WHITE), new Double3(0.2))); //
+                .setAmbient(new AmbientLight(new Color(WHITE), new Double3(0.2))); //
 
         scene.geometries.add( //
                 new Sphere(new Point(0, 0, -100), 50),

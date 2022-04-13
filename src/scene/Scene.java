@@ -21,7 +21,7 @@ public class Scene {
     /**
      * The environmental light of the scene
      */
-    public AmbientLight ambientLight;
+    public AmbientLight ambient;
     /**
      * The geometry shapes in the 3D model of the scene
      */
@@ -41,7 +41,7 @@ public class Scene {
     public Scene(String name) {
         this.name = name;
         this.background = Color.BLACK;
-        this.ambientLight = new AmbientLight();
+        this.ambient = new AmbientLight();
         this.geometries = new Geometries();
         this.lights = new LinkedList<>();
     }
@@ -58,11 +58,11 @@ public class Scene {
 
     /**
      * This method is used for updating the ambient light
-     * @param ambientLight - Color
+     * @param ambient - Color
      * @return Scene
      */
-    public Scene setAmbientLight(AmbientLight ambientLight) {
-        this.ambientLight = ambientLight;
+    public Scene setAmbient(AmbientLight ambient) {
+        this.ambient = ambient;
         return this;
     }
 

@@ -13,6 +13,14 @@ public class Material {
      */
     public Double3 kS = Double3.ZERO;
     /**
+     * Transparent factor of attenuation of the material
+     */
+    public Double3 kT = Double3.ZERO;
+    /**
+     * Reflected factor of attenuation of the material
+     */
+    public Double3 kR = Double3.ZERO;
+    /**
      * The size of shininess of the material
      */
     public int nShininess = 0;
@@ -58,6 +66,26 @@ public class Material {
     }
 
     /**
+     * This method is used for updating the transparent factor of attenuation
+     * @param kT - the updated transparent factor of attenuation
+     * @return Material
+     */
+    public Material setKt(double kT) {
+        this.kT = new Double3(kT);
+        return this;
+    }
+
+    /**
+     * This method is used for updating the reflected factor of attenuation
+     * @param kR - the updated reflected factor of attenuation
+     * @return Material
+     */
+    public Material setKr(double kR) {
+        this.kR = new Double3(kR);
+        return this;
+    }
+
+    /**
      * This method is used for updating the shininess of the material
      * @param nShininess - the updated size of shininess of the material
      * @return Material
@@ -66,4 +94,5 @@ public class Material {
         this.nShininess = nShininess;
         return this;
     }
+
 }

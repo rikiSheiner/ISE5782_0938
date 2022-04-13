@@ -24,10 +24,22 @@ public class Ray {
      */
     public Ray(Point p, Vector v) {
         this.p0 = p;
-        if(v.length() == 1)
-            this.dir = v;
-        else
-            this.dir = v.normalize();
+        this.dir = v.normalize();
+    }
+
+    /**
+     * Ray constructor based on vector direction and start point that
+     * move by delta * n
+     * @param p0 - the start point of the calculating
+     * @param dir - the direction vector of the ray
+     * @param n - the normal vector to the geometry in p0
+     * @param delta - the scalar for scaling n
+     */
+    public Ray(Point p0, Vector dir, Vector n, double delta){
+        this.dir = dir.normalize();
+
+        double nv = n.dotProduct(dir);
+        this.p0 = p0.add(n.scale(nv > 0 ? delta : -delta));
     }
 
     /**
