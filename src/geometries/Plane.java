@@ -13,11 +13,11 @@ public class Plane extends Geometry {
     /**
      * The reference point of the plane
      */
-    private Point q0;
+    protected Point q0;
     /**
      * The normal vector to the plane
      */
-    private Vector normal;
+    protected Vector normal;
 
     /**
      * Plane parameters constructor

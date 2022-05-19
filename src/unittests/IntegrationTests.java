@@ -123,6 +123,96 @@ public class IntegrationTests {
     }
 
     /**
+     * Test method for
+     * {@link renderer.Camera#constructRay(int, int, int, int)}.
+     * {@link geometries.Cone#findIntersections(Ray)}.
+     */
+    @Test
+    void testRayIntersectionWithCone(){
+        int counter = 0; // the number of intersection points of the rays from camera's view plane with the cone
+
+        Camera camera = new Camera(new Point(0,0,0), new Vector(0,0,-1), new Vector(0,1,0))
+                .setVPSize(3,3).setVPDistance(2);
+
+        //TC01: 0 intersection points
+        Cone cone1 = new Cone(5, 10, new Point(10,10,-50));
+        counter = countRayIntersections(cone1, camera, 3, 3);
+        assertEquals(0, counter, "0 intersection points with cone");
+
+        //TC02: 3 intersection points
+        Cone cone3 = new Cone(20, 2, new Point(1,0,-2));
+        counter = countRayIntersections(cone3, camera, 3, 3);
+        assertEquals(3, counter, "3 intersection points with cone");
+
+    }
+
+    /**
+     * Test method for
+     * {@link renderer.Camera#constructRay(int, int, int, int)}.
+     * {@link geometries.Tube#findIntersections(Ray)}.
+     */
+    @Test
+    void testRayIntersectionWithTube(){
+        int counter = 0;
+        Camera camera = new Camera(new Point(0,0,0), new Vector(0,0,-1), new Vector(0,1,0))
+                .setVPSize(3,3).setVPDistance(2);
+
+        //TC01: 0 intersection points
+
+
+        //TC02: 9 intersection points
+        Tube tube2 = new Tube(new Ray(new Point(10,0,-5), new Vector(1,0,0)),3);
+        counter = countRayIntersections(tube2, camera, 3, 3);
+        assertEquals(9, counter, "9 intersection points with tube");
+    }
+
+    /**
+     * Test method for
+     * {@link renderer.Camera#constructRay(int, int, int, int)}.
+     * {@link geometries.Cylinder#findIntersections(Ray)}.
+     */
+    @Test
+    void testRayIntersectionWithCylinder(){
+        int counter = 0;
+        Camera camera = new Camera(new Point(0,0,0), new Vector(0,0,-1), new Vector(0,1,0))
+                .setVPSize(3,3).setVPDistance(3);
+
+        //TC01: 0 intersection points
+        Cylinder cylinder1 = new Cylinder(new Ray(new Point(100,110,115), new Vector(0,1,0)),1, 3);
+         counter = countRayIntersections(cylinder1, camera, 3, 3);
+         assertEquals(0, counter, "0 intersection points with cylinder");
+
+        //TC02: 6 intersection points
+        Cylinder cylinder2 = new Cylinder(new Ray(new Point(0,0,-5), new Vector(0,0,-1)),3, 5);
+        counter = countRayIntersections(cylinder2, camera, 3, 3);
+        assertEquals(6, counter, "0 intersection points with cylinder");
+
+    }
+
+    /**
+     * Test method for
+     * {@link renderer.Camera#constructRay(int, int, int, int)}.
+     * {@link geometries.Square#findIntersections(Ray)}.
+     */
+    @Test
+    void testRayIntersectionWithSquare(){
+        int counter = 0;
+        Camera camera = new Camera(new Point(0,0,0), new Vector(0,0,-1), new Vector(0,1,0))
+                .setVPSize(3,3).setVPDistance(3);
+
+        //TC01: 0 intersection points
+        Square square1 = new Square(new Point(1,0,10), new Point(-1,0,10), new Point(-1,-1,10), new Point(1,-1,10));
+        counter = countRayIntersections(square1, camera, 3, 3);
+        assertEquals(0, counter, "0 intersection points with square");
+
+        //TC02: 6 intersection points
+        Square square2 = new Square(new Point(1,0,-2), new Point(-1,0,-2), new Point(-1,-1,-2), new Point(1,-1,-2));
+        counter = countRayIntersections(square2, camera, 3, 3);
+        assertEquals(6, counter, "6 intersection points with square");
+
+    }
+
+    /**
      * This method is used for counting the number of intersection points of a camera rays' with geometry
      * @param geo the geometry shape which the rays may intersect with
      * @param camera the camera where the rays come from
