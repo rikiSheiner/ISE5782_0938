@@ -1,6 +1,8 @@
 package renderer;
 import primitives.*;
 
+import java.util.LinkedList;
+import java.util.List;
 import java.util.MissingResourceException;
 import java.lang.UnsupportedOperationException;
 
@@ -45,6 +47,10 @@ public class Camera {
      * the base of the ray tracing for the camera
      */
     private RayTracerBase rayTracer;
+    /**
+     * the number of rays in the beam of rays which we cast from pixel
+     */
+    private int numSamples;
 
     public double getHeight() {
         return height;
@@ -56,6 +62,10 @@ public class Camera {
 
     public double getDistance() {
         return distance;
+    }
+
+    public int getNumSamples() {
+        return numSamples;
     }
 
     /**
@@ -73,6 +83,9 @@ public class Camera {
             throw new IllegalArgumentException("The direction vectors of the camera are not orthogonal");
         this.vRight = v_to.crossProduct(v_up).normalize();
     }
+
+
+
 
     public Camera setVPSize(double width, double height){
         this.width = width;
@@ -94,6 +107,12 @@ public class Camera {
         this.rayTracer = rayTracer;
         return this;
     }
+
+    public Camera setNumSamples(int numSamples) {
+        this.numSamples = numSamples;
+        return this;
+    }
+
 
     /**
      * The function ConstructRay is used for creation of ray through
@@ -123,6 +142,48 @@ public class Camera {
         return new Ray(p0,Pij.subtract(p0));
     }
 
+
+
+    /**
+     * The function constructRayBeamThroughPixel is used for creation of beam of rays through
+     * specific pixel in the view plane.
+     * @param nX - the number of pixels in X axis
+     * @param nY - the number of pixels in Y axis
+     * @param j - the index on X axis
+     * @param i - the index on Y axis
+     * @return List of Ray
+     */
+    public List<Ray> constructRayBeamThroughPixel(int nX, int nY, int j, int i) {
+        // super sampling with grid
+        Point Pc = p0.add(vTo.scale(distance)); // the center point of the view plane
+
+        double Ry = height/nY; // the height of pixel in the view plane
+        double Rx = width/nX; // the width of pixel in the view plane
+
+        double Yi = (i-nY/2d)*Ry+Ry/2d;
+        double Xj = (j-nX/2d)*Rx+Rx/2d;
+
+        double sqrtNumSamples = Math.sqrt(numSamples);
+        double sampleWidth = Rx / (2*sqrtNumSamples);
+        double sampleHeight = Ry / (2*sqrtNumSamples);
+
+        Point p = Pc.add(vRight.scale(Xj)).subtract(vUp.scale(Yi));
+        Point Pij;
+        List<Ray> rays = new LinkedList<>(); // the beam of rays
+
+        for(int k = 0; k < sqrtNumSamples; k++){
+            for(int l = 0; l < sqrtNumSamples; l++){
+                Pij = new Point(p.getXyz().getD1()+k*sampleWidth, p.getXyz().getD2()+l*sampleHeight,p.getXyz().getD3());
+                rays.add(new Ray(p0, Pij.subtract(p0).normalize()));
+            }
+        }
+
+        return rays;
+
+    }
+
+
+
     /**
      * Function renderImage is used for constructing a rays through each pixel
      * in the view plane and coloring the pixels of the image accordingly.
@@ -137,15 +198,35 @@ public class Camera {
         int nX = imageWriter.getNx();
         int nY = imageWriter.getNy();
 
-        for(int i = 0;  i< nY; i++){
-            for(int j = 0; j < nX; j++){
-                Ray ray = constructRay(nX, nY, j, i);
-                imageWriter.writePixel(j, i, rayTracer.traceRay(ray));
+        if(numSamples <= 1){
+            for(int i = 0;  i< nY; i++){
+                for(int j = 0; j < nX; j++){
+                    Ray ray = constructRay(nX, nY, j, i);
+                    imageWriter.writePixel(j, i, rayTracer.traceRay(ray));
+                }
             }
+        }
+        else{ // super sampling
+            List<Ray> rays;
+            Color avgColor;
+
+            for(int i = 0;  i< nY; i++){
+                for(int j = 0; j < nX; j++){
+                    rays = this.constructRayBeamThroughPixel(nX, nY, j, i);
+                    avgColor = new Color(0,0,0);
+                    for(Ray ray : rays){
+                        avgColor = avgColor.add(rayTracer.traceRay(ray));
+                    }
+                    avgColor = avgColor.reduce(numSamples);
+                    imageWriter.writePixel(j, i, avgColor);
+                }
+            }
+
         }
 
         return this;
     }
+
 
     /**
      *Function printGrid is used for coloring the grid of the image
