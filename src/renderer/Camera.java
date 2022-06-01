@@ -59,16 +59,17 @@ public class Camera {
      */
     private boolean isDepthOfField;
     /**
-     * the size of the aperture of the camera
+     * the size of the aperture of the camera -
+     * determines how blurry objects that are out of focus will appear
      */
     private double apertureSize;
     /**
-     * the maximal distance between the camera to the objects in focus
+     * the distance between the camera to the objects in focus
      */
     private double focalLength;
 
 
-    // constructors
+    //------------------------------------------ constructors -----------------------------------------------------
     /**
      * Camera parameters constructor
      *
@@ -112,7 +113,7 @@ public class Camera {
     }
 
 
-    // getters
+    //------------------------------------------ getters -----------------------------------------------------
     public double getHeight() {
         return height;
     }
@@ -127,7 +128,7 @@ public class Camera {
     }
 
 
-    // setters
+    //------------------------------------------ setters -----------------------------------------------------
     public Camera setVPSize(double width, double height) {
         this.width = width;
         this.height = height;
@@ -150,7 +151,7 @@ public class Camera {
         return this;
     }
 
-
+    //------------------------------------------ constructors of rays -----------------------------------------------------
     /**
      * The function ConstructRay is used for creation of ray through
      * specific pixel in the view plane.
@@ -181,23 +182,29 @@ public class Camera {
     }
 
 
-
+    /**
+     * The function constructRaysThroughPixel is used for constructing a beam of rays through pixel.
+     * @param nX - the number of pixels in X axis
+     * @param nY - the number of pixels in Y axis
+     * @param j  - the index on X axis
+     * @param i  - the index on Y axis
+     * @return List of Ray
+     */
     public List<Ray> constructRaysThroughPixel(int nX, int nY, int j, int i)
     {
-        Ray ray=constructRay( nX,  nY, j,  i); // the ray through the center of the pixel
+        Ray ray = constructRay( nX,  nY, j,  i); // ray through the center of pixel (j,i)
 
-        // the effect of anti aliasing is active
+        // only the effect of anti aliasing is active
         if(this.isDepthOfField == false)
             return constructRaysForAntiAliasing(nX,nY,j,i);
 
         // the effect of depth of field is active
-        Point edgePoint=p0.add(vUp.scale((apertureSize/2)).subtract(vRight.scale((apertureSize /2))));
-        return constructRaysForDepthOfField(ray,edgePoint);
+        return constructRaysForDepthOfField(ray);
     }
 
     /**
-     * The function constructRaysForAntiAliasing is used for creation of beam of rays through
-     * specific pixel in the view plane.
+     * The function constructRaysForAntiAliasing is used for creation of numSamples rays through
+     * specific pixel in the view plane for anti aliasing in the picture.
      *
      * @param nX - the number of pixels in X axis
      * @param nY - the number of pixels in Y axis
@@ -223,10 +230,11 @@ public class Camera {
         Point Pij;
 
         double move1, move2;
+        Random random = new Random();
 
         for (int k = 0; k < numSamples; k++) {
-            move1 = new Random().nextDouble(-Rx / 2, Rx / 2);
-            move2 = new Random().nextDouble(-Ry / 2, Ry / 2);
+            move1 = random.nextDouble(-Rx / 2, Rx / 2);
+            move2 = random.nextDouble(-Ry / 2, Ry / 2);
 
             Pij = new Point(p.getXyz().getD1() + move1, p.getXyz().getD2() + move2, p.getXyz().getD3());
             rays.add(new Ray(p0, Pij.subtract(p0).normalize()));
@@ -237,48 +245,48 @@ public class Camera {
 
 
     /**
-     * Function findFocalPoint is used for finding the focal point with ray,
-     * by using law of cosines on the triangle that the ray and vTo create.
+     * Function findFocalPoint is used for finding the focal point with ray.
      * @param ray - the ray that through the center of the pixel
-     * @return focal point
+     * @return Point - focal point of the camera
      */
-    public Point findFocalPoint( Ray ray)
+    public Point findFocalPoint(Ray ray)
     {
-        double cosine=vTo.dotProduct(ray.getDir()); //the cosine of the angle between vto and the vector of ray from pixel
-        double distance=this.focalLength /cosine; //the length of the ray from the camera to the focal point by using the law of cosines
-        Point focalPoint=ray.getPoint(distance); //find focal point by the ray and the distance from camera.
-        return focalPoint;
+        // calculating of focal point by multiplying
+        // the ray direction by the focal length
+        return ray.getPoint(focalLength);
     }
 
     /**
-     * Function constructRaysForDepthOfField gets the up right point of the square,
-     * creates the three others edges based on the aperture size
-     * and returns the rays from them to the focal point.
-     * @param ray - the ray through the center of the pixel
-     * @param edge1 - the up and right point of the square
-     * @return list of Ray
+     * Function constructRaysForDepthOfField is used for constructing rays for
+     * the DOF effect.
+     * It is done by creating of numSamples rays from the origin of the ray
+     * -which passes through the center of the pixel- shifted by random number
+     * -which is effected by the apertureSize- to the focal point of the camera.
+     * @param ray - the ray which passes through the center of the pixel
+     * @return List of Ray
      */
-    public List<Ray> constructRaysForDepthOfField(Ray ray,Point edge1)
+    public List<Ray> constructRaysForDepthOfField(Ray ray)
     {
-        Point focalPoint=this.findFocalPoint(ray); // the focal point of the camera
-        List<Ray> rays=new LinkedList<>();
+        Point focalPoint = this.findFocalPoint(ray); // the focal point of the camera
+        List<Ray> rays = new LinkedList<>();
+        Random random = new Random();
+        Vector multiVector;
+        Point originPoint;
 
-        //p1 is the left up edge of the square
-        Point edge2 = edge1.add(vRight.scale(apertureSize));// the right up edge
-        Point edge3 = edge2.subtract(vUp.scale(apertureSize));// the right down edge
-        Point edge4 = edge3.subtract(vRight.scale(apertureSize));// the left down edge
+        for(int i = 0; i < numSamples; i++){
 
-        //create rays from the points to the focal point
-        rays.add(new Ray(edge1,focalPoint.subtract(edge1)));
-        rays.add(new Ray(edge2,focalPoint.subtract(edge2)));
-        rays.add(new Ray(edge3,focalPoint.subtract(edge3)));
-        rays.add(new Ray(edge4,focalPoint.subtract(edge4)));
-        rays.add(ray); //the ray through the center of the pixel
+            // calculating of the vector for shifting the origin of the ray
+            multiVector = new Vector(random.nextDouble(-0.5,0.5),random.nextDouble(-0.5,0.5),random.nextDouble(-0.5,0.5));
+            multiVector.scale(apertureSize);
+
+            originPoint = ray.getP0().add(multiVector); // shifting the point of the origin of the ray
+            rays.add(new Ray(originPoint, focalPoint.subtract(originPoint))); // adding the shifted ray to the rays' list
+        }
 
         return rays;
     }
 
-
+    //------------------------------------------ additional functions -----------------------------------------------------
     /**
      * Function renderImage is used for constructing a rays through each pixel
      * in the view plane and coloring the pixels of the image accordingly.
