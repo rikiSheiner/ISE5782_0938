@@ -224,7 +224,6 @@ public class RayTracerBasic extends RayTracerBase{
         return ktr;
     }
 
-
     /**
      * This method is used for constructing the refracted (transparent) ray
      * from the geometry body at specific point
@@ -255,6 +254,7 @@ public class RayTracerBasic extends RayTracerBase{
         Vector r = v.subtract(temp);
         return new Ray(p, r, n, DELTA);
     }
+
 
     /**
      * This method is used for finding the closest intersection point of
