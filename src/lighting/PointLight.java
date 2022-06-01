@@ -4,6 +4,7 @@ import primitives.*;
 
 /**
  * PointLight class represents an omnidirectional light source (like a bulb)
+ * @author Rivka Sheiner
  */
 public class PointLight extends Light implements LightSource{
 

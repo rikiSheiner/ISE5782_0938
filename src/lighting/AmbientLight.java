@@ -4,6 +4,7 @@ import primitives.*;
 
 /**
  * AmbientLight class represents the environmental light of the scene
+ * @author Rivka Sheiner
  */
 public class AmbientLight extends Light {
 

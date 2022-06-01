@@ -4,6 +4,7 @@ import primitives.*;
 
 /**
  * DirectionalLight class represents a far away light source (like the sun)
+ *  * @author Rivka Sheiner
  */
 public class DirectionalLight extends Light implements LightSource{
 

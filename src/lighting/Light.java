@@ -4,6 +4,7 @@ import primitives.*;
 
 /**
  * Light class represents a light in the scene
+ * @author Rivka Sheiner
  */
 abstract class Light {
 

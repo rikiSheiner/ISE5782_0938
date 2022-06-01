@@ -4,6 +4,7 @@ import primitives.*;
 
 /**
  * LightSource class represents a source of light in the scene
+ * @author Rivka Sheiner
  */
 public interface LightSource {
     /**

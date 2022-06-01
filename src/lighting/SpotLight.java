@@ -4,6 +4,7 @@ import primitives.*;
 
 /**
  * SpotLight class represents a light source that shines at 180 degrees
+ * @author Rivka Sheiner
  */
 public class SpotLight extends PointLight{
 
