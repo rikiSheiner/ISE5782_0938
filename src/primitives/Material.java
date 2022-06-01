@@ -2,6 +2,7 @@ package primitives;
 
 /**
  * Material class represents the material from which a geometric body is made
+ * @author Rivka Sheiner
  */
 public class Material {
     /**
