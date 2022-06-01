@@ -8,6 +8,10 @@ import lighting.*;
 import java.util.LinkedList;
 import java.util.List;
 
+/**
+ * Class scene is used to create a scene that the camera captures
+ * @author Rivka Sheiner
+ */
 public class Scene {
 
     /**
