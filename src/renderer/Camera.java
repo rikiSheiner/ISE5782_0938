@@ -72,7 +72,7 @@ public class Camera {
     /**
      * the number of threads used for rendering the pictures
      */
-    private int numThreads = 3;
+    private int numThreads = 1;
     /**
      * the maximal level of multi threading which can be used for rendering the pictures
      */
@@ -124,7 +124,7 @@ public class Camera {
             pixels = 0;
             printInterval = (int) (interval * 1000);
             print = printInterval != 0;
-
+            last = -1l;
         }
 
         /**
