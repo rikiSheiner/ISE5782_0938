@@ -1,4 +1,5 @@
 package renderer;
+
 import primitives.*;
 
 import java.util.LinkedList;
@@ -6,6 +7,7 @@ import java.util.List;
 import java.util.MissingResourceException;
 import java.lang.UnsupportedOperationException;
 import java.util.Random;
+import java.util.stream.IntStream;
 
 /**
  * Camera class represents the camera which takes the picture
@@ -13,7 +15,7 @@ import java.util.Random;
  */
 public class Camera {
 
-    // fields
+    //------------------------------------------ fields -----------------------------------------------------
     /**
      * the location of the camera
      */
@@ -67,6 +69,138 @@ public class Camera {
      * the distance between the camera to the objects in focus
      */
     private double focalLength;
+    /**
+     * the number of threads used for rendering the pictures
+     */
+    private int numThreads = 3;
+    /**
+     * the maximal level of multi threading which can be used for rendering the pictures
+     */
+    private final int MAX_NUM_THREADS = 4;
+
+
+    /**
+     * Pixel is a helper class. It is used for multi-threading in the renderer and
+     * for follow up its progress.<br/>
+     * There is a main follow-up object and several secondary objects - one in each
+     * thread.
+     *
+     * @author Dan
+     *
+     */
+    class Pixel {
+        private static int maxRows = 0;
+        private static int maxCols = 0;
+        private static long totalPixels = 0l;
+
+        private static volatile int cRow = 0;
+        private static volatile int cCol = -1;
+        private static volatile long pixels = 0l;
+        private static volatile long last = -1l;
+        private static volatile int lastPrinted = -1;
+
+        private static boolean print = false;
+        private static long printInterval = 100l;
+        private static final String PRINT_FORMAT = "%5.1f%%\r";
+        private static Object mutexNext = new Object();
+        private static Object mutexPixels = new Object();
+
+        int row;
+        int col;
+
+        /**
+         * Initialize pixel data for multi-threading
+         *
+         * @param maxRows  the amount of pixel rows
+         * @param maxCols  the amount of pixel columns
+         * @param interval print time interval in seconds, 0 if printing is not required
+         */
+        static void initialize(int maxRows, int maxCols, double interval) {
+            Pixel.maxRows = maxRows;
+            Pixel.maxCols = maxCols;
+            Pixel.totalPixels = (long) maxRows * maxCols;
+            cRow = 0;
+            cCol = -1;
+            pixels = 0;
+            printInterval = (int) (interval * 1000);
+            print = printInterval != 0;
+
+        }
+
+        /**
+         * Function for thread-safe manipulating of main follow-up Pixel object - this
+         * function is critical section for all the threads, and static data is the
+         * shared data of this critical section.<br/>
+         * The function provides next available pixel number each call.
+         *
+         * @return true if next pixel is allocated, false if there are no more pixels
+         */
+        public boolean nextPixel() {
+            synchronized (mutexNext) {
+                if (cRow == maxRows)
+                    return false;
+                ++cCol;
+                if (cCol < maxCols) {
+                    row = cRow;
+                    col = cCol;
+                    return true;
+                }
+                cCol = 0;
+                ++cRow;
+                if (cRow < maxRows) {
+                    row = cRow;
+                    col = cCol;
+                    return true;
+                }
+                return false;
+            }
+        }
+
+        /**
+         * Finish pixel processing
+         */
+        static void pixelDone() {
+            synchronized (mutexPixels) {
+                ++pixels;
+            }
+        }
+
+        /**
+         * Wait for all pixels to be done and print the progress percentage - must be
+         * run from the main thread
+         */
+        public static void waitToFinish() {
+            if (print)
+                System.out.printf(PRINT_FORMAT, 0d);
+
+            while (last < totalPixels) {
+                printPixel();
+                try {
+                    Thread.sleep(printInterval);
+                } catch (InterruptedException ignore) {
+                    if (print)
+                        System.out.print("");
+                }
+            }
+            if (print)
+                System.out.println("100.0%");
+        }
+
+        /**
+         * Print pixel progress percentage
+         */
+        public static void printPixel() {
+            long current = pixels;
+            if (print && last != current) {
+                int percentage = (int) (1000l * current / totalPixels);
+                if (lastPrinted != percentage) {
+                    last = current;
+                    lastPrinted = percentage;
+                    System.out.printf(PRINT_FORMAT, percentage / 10d);
+                }
+            }
+        }
+    }
 
 
     //------------------------------------------ constructors -----------------------------------------------------
@@ -148,6 +282,15 @@ public class Camera {
     }
     public Camera setNumSamples(int numSamples) {
         this.numSamples = numSamples;
+        return this;
+    }
+    public Camera setNumThreads(int numThreads) {
+        if(numThreads < 1 )
+            throw new IllegalArgumentException("the level of multi threading must be positive number");
+        if(numThreads > MAX_NUM_THREADS )
+            throw new IllegalArgumentException("the level of multi threading can't be greater than 4");
+
+        this.numThreads = numThreads;
         return this;
     }
 
@@ -286,6 +429,7 @@ public class Camera {
         return rays;
     }
 
+
     //------------------------------------------ additional functions -----------------------------------------------------
     /**
      * Function renderImage is used for constructing a rays through each pixel
@@ -311,27 +455,39 @@ public class Camera {
             }
         }
         else { // super sampling
-            List<Ray> rays;
-            Color avgColor;
 
-            for (int i = 0; i < nY; i++) {
-                for (int j = 0; j < nX; j++) {
-                    rays = constructRaysThroughPixel(nX,nY,j,i);
-                    avgColor = new Color(0, 0, 0);
-
-                    for (Ray ray : rays) {
-                        avgColor = avgColor.add(rayTracer.traceRay(ray));
-                    }
-
-                    avgColor = avgColor.reduce(rays.size());
-                    imageWriter.writePixel(j, i, avgColor);
-                }
-            }
+            // multi threading for acceleration of performances
+            Pixel.initialize(nY, nX, Pixel.printInterval);
+            IntStream.range(0, nY).parallel().forEach(i -> {
+                IntStream.range(0, nX).parallel().forEach(j -> {
+                    List<Ray> rays = constructRaysThroughPixel(nX,nY,j,i);
+                    imageWriter.writePixel(j, i, calcColor(rays));
+                    Pixel.pixelDone();
+                    Pixel.printPixel();
+                });
+            });
         }
 
         return this;
     }
 
+    /**
+     * The function calcColor is help function used for calculating the color of pixel
+     * according to the average color of the rays which are being sent through
+     * the pixel.
+     * @param rays - List of rays through pixel
+     * @return Color - the average color of the rays
+     */
+    private Color calcColor(List<Ray> rays) {
+        Color avgColor = new Color(0, 0, 0);
+
+        for (Ray ray : rays) {
+            avgColor = avgColor.add(rayTracer.traceRay(ray));
+        }
+
+        avgColor = avgColor.reduce(rays.size());
+        return avgColor;
+    }
 
     /**
      * Function printGrid is used for coloring the grid of the image
@@ -364,10 +520,5 @@ public class Camera {
             throw new MissingResourceException("Can't write to image, because of lack of producer to the picture", "Camera", "lack of imageWriter");
         this.imageWriter.writeToImage();
     }
-
-
-
-
-
 
 }
