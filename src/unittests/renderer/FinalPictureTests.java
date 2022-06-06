@@ -264,6 +264,139 @@ public class FinalPictureTests {
                 .writeToImage();
     }
 
+    @Test
+    public void pictureMP2(){
+        Scene scene3 = new Scene("MP2 scene").setBackground(new Color(0,200,216));
+        Camera camera3 = new Camera(new Point(0, 0, 1000), new Vector(0, 0, -1), new Vector(0, 1, 0),1.5,800,true,1) //
+                .setVPSize(600, 600).setVPDistance(1000);
+
+
+        // adding middle path
+        int x = 30, y = -20, z = -60;
+        for(int i = 0; i < 5; i++){
+            scene3.geometries.add(
+                    new Square(new Point(x,y,z), new Point(-x,y,z), new Point(-x-10,y-40,z+40), new Point(x+10,y-40,z+40))
+                            .setEmission(new Color(blue))
+                            .setMaterial(new Material().setKd(0.5)));
+            x+=10; y-=50; z+=55;
+        }
+        // adding winning gate at the end of the middle path
+        scene3.geometries.add(new Square(new Point(30,-20,-60), new Point(20,-20,-60), new Point(20,60,-60), new Point(30,60,-60))
+                        .setEmission(new Color(237,15,23)),
+                new Square(new Point(-30,-20,-60), new Point(-20,-20,-60), new Point(-20,60,-60), new Point(-30,60,-60))
+                        .setEmission(new Color(237,15,23)),
+                new Square(new Point(30,70,-60), new Point(-30,70,-60), new Point(-30,60,-60), new Point(30,60,-60))
+                        .setEmission(new Color(237,15,23)));
+        for(int i = 0; i < 3; i++){
+            scene3.geometries.add(new Triangle(new Point(30-20*i,70,-60), new Point(20-20*i,85,-60), new Point(10-20*i,70,-60))
+                    .setEmission(new Color(237,15,23)));
+        }
+
+        // adding left path
+        x = -100; y = -20; z = -60;
+        for(int i = 0; i < 5; i++){
+            scene3.geometries.add(
+                    new Square(new Point(x,y,z), new Point(x-60,y,z), new Point(x-80,y-40,z+40), new Point(x-10,y-40,z+40))
+                            .setEmission(new Color(blue))
+                            .setMaterial(new Material().setKd(0.5)));
+            x-=20; y-=50; z+=55;
+        }
+
+        // adding winning gate at the end of the left path
+        scene3.geometries.add(new Square(new Point(-160,-20,-60), new Point(-150,-20,-60), new Point(-150,60,-60), new Point(-160,60,-60))
+                        .setEmission(new Color(237,15,23)),
+                new Square(new Point(-100,-20,-60), new Point(-110,-20,-60), new Point(-110,60,-60), new Point(-100,60,-60))
+                        .setEmission(new Color(237,15,23)),
+                new Square(new Point(-160,70,-60), new Point(-100,70,-60), new Point(-100,60,-60), new Point(-160,60,-60))
+                        .setEmission(new Color(237,15,23)));
+        for(int i = 0; i < 3; i++){
+            scene3.geometries.add(new Triangle(new Point(-160+20*i,70,-60), new Point(-150+20*i,85,-60), new Point(-140+20*i,70,-60))
+                    .setEmission(new Color(237,15,23)));
+        }
+
+
+        // adding right path
+        x = 100; y = -20; z = -60;
+        for(int i = 0; i < 5; i++){
+            scene3.geometries.add(
+                    new Square(new Point(x,y,z), new Point(x+60,y,z), new Point(x+80,y-40,z+40), new Point(x+10,y-40,z+40))
+                            .setEmission(new Color(blue))
+                            .setMaterial(new Material().setKd(0.5)));
+            x+=20; y-=50; z+=55;
+        }
+
+        // adding winning gate at the end of the right path
+        scene3.geometries.add(new Square(new Point(160,-20,-60), new Point(150,-20,-60), new Point(150,60,-60), new Point(160,60,-60))
+                        .setEmission(new Color(237,15,23)),
+                new Square(new Point(100,-20,-60), new Point(110,-20,-60), new Point(110,60,-60), new Point(100,60,-60))
+                        .setEmission(new Color(237,15,23)),
+                new Square(new Point(160,70,-60), new Point(100,70,-60), new Point(100,60,-60), new Point(160,60,-60))
+                        .setEmission(new Color(237,15,23)));
+        for(int i = 0; i < 3; i++){
+            scene3.geometries.add(new Triangle(new Point(160-20*i,70,-60), new Point(150-20*i,85,-60), new Point(140-20*i,70,-60))
+                    .setEmission(new Color(237,15,23)));
+        }
+
+        // adding balls on the middle path
+        scene3.geometries.add(new Sphere(new Point(0,-10,-30),20)
+                .setEmission(new Color(red)).setMaterial(new Material().setKd(0.5)));
+        scene3.geometries.add(new Sphere(new Point(20,-120,70),20)
+                .setEmission(new Color(blue)).setMaterial(new Material().setKd(0.5)));
+        scene3.geometries.add(new Sphere(new Point(-30,-180,140),20)
+                .setEmission(new Color(green)).setMaterial(new Material().setKd(0.5).setKt(0.3)));
+
+
+        // adding balls on the left path
+        scene3.geometries.add(new Sphere(new Point(-130,-10,-30),15)
+                .setEmission(new Color(blue)).setMaterial(new Material().setKt(0.5).setKd(0.5)));
+        scene3.geometries.add(new Sphere(new Point(-170,-120,70),15)
+                .setEmission(new Color(green)).setMaterial(new Material().setKt(0.5).setKd(0.5)));
+        scene3.geometries.add(new Sphere(new Point(-180,-180,140),15)
+                .setEmission(new Color(red)).setMaterial(new Material().setKt(0.5).setKd(0.5)));
+
+        // adding balls on the right path
+        scene3.geometries.add(new Sphere(new Point(130,-10,-30),15)
+                .setEmission(new Color(blue)).setMaterial(new Material().setKd(0.5)));
+        scene3.geometries.add(new Sphere(new Point(170,-120,70),15)
+                .setEmission(new Color(red)).setMaterial(new Material().setKd(0.5)));
+        scene3.geometries.add(new Sphere(new Point(190,-180,140),15)
+                .setEmission(new Color(green)).setMaterial(new Material().setKd(0.5).setKt(0.5)));
+
+
+        // adding white clouds to the scene
+        x = 220;
+        for(int i = 0; i < 4; i++){
+            for(int j = 0; j < 3; j++){
+                scene3.geometries.add(new Sphere(new Point(x+20*j,200,-100),20)
+                        .setEmission(new Color(white)));
+                scene3.geometries.add(new Sphere(new Point(x-20*j,200,-100),20)
+                        .setEmission(new Color(white)) );
+
+                scene3.geometries.add(new Sphere(new Point(x-20*j,260,-100),20)
+                        .setEmission(new Color(white)));
+                scene3.geometries.add(new Sphere(new Point(x+20*j,260,-100),20)
+                        .setEmission(new Color(white)));
+            }
+            x-=150;
+        }
+
+        // adding light sources to the scene
+        scene3.lights.add(new DirectionalLight(new Color(100,0,100),new Vector(0,0,-1)));
+        scene3.lights.add(new PointLight(new Color(0,200,20), new Point(70,100,250)));
+
+        // light from the sky in the clouds
+        scene3.lights.add(new SpotLight(new Color(yellow),new Point(0,200,-150), new Vector(0,-0,1)));
+
+        scene3.lights.add(new PointLight(new Color(255,242,0), new Point(-130,100,-60)));
+        scene3.lights.add(new PointLight(new Color(255,242,0), new Point(130,100,-60)));
+
+
+        camera3.setImageWriter(new ImageWriter("pictureMP2", 500, 500)) //
+                .setRayTracer(new RayTracerBasic(scene3)) //
+                .renderImage() //
+                .writeToImage();
+
+    }
 
 
 }
