@@ -21,13 +21,12 @@ import static java.awt.Color.orange;
  */
 public class FinalPictureTests {
 
-
     @Test
-    public void pictureForMP1(){
+    public void picture1ForMP1(){
 
-        Scene scene = new Scene("MP1 scene").setBackground(new Color(0,200,216));
-        Camera camera1 = new Camera(new Point(0, 0, 1000), new Vector(0, 0, -1), new Vector(0, 1, 0),1.5,800,true,49) //
-                .setVPSize(200, 200).setVPDistance(1000);
+        Scene scene = new Scene("MP1 picture1 scene").setBackground(new Color(0,200,216));
+        Camera camera1 = new Camera(new Point(0, 0, 1000), new Vector(0, 0, -1), new Vector(0, 1, 0),1.5,800,true,125) //
+                .setVPSize(200, 200).setVPDistance(1000).setNumThreads(3);
 
 
         scene.geometries.add(
@@ -153,12 +152,117 @@ public class FinalPictureTests {
         scene.lights.add(new DirectionalLight(new Color(100,0,100),new Vector(0,0,-1)));
         scene.lights.add(new PointLight(new Color(0,200,20), new Point(70,100,250)));
 
-        camera1.setImageWriter(new ImageWriter("pictureMP1", 500, 500)) //
+        camera1.setImageWriter(new ImageWriter("picture1MP1", 500, 500)) //
                 .setRayTracer(new RayTracerBasic(scene)) //
                 .renderImage() //
                 .writeToImage();
     }
 
+    @Test
+    public void picture2ForMP1() {
+        Scene scene2 = new Scene("MP1 picture2 scene").setBackground(new Color(13, 38, 122));
+        Camera camera2 = new Camera(new Point(0, 0, 1000), new Vector(0, 0, -1), new Vector(0, 1, 0), 1.5, 600, true, 125) //
+                .setVPSize(300, 300).setVPDistance(1000).setNumThreads(3);
+
+
+        // adding spaceship to the scene
+        scene2.geometries.add(new Cylinder(new Ray(new Point(0,0,0), new Vector(0,1,0)),15,65)
+                        .setEmission(new Color(orange)),
+                new Cone(30, 15, new Point(0,65,0))
+                        .setEmission(new Color(red)),
+                new Square(new Point(12,0,0), new Point(-12,0,0),new Point(-12,-5,0), new Point(12,-5,0))
+                        .setEmission(new Color(red)),
+                new Square(new Point(7,-10,0), new Point(-7,-10,0),new Point(-7,-5,0), new Point(7,-5,0))
+                        .setEmission(new Color(gray)),
+                new Triangle(new Point(7,-10,0), new Point(-7,-10,0), new Point(0,-40,0))
+                        .setEmission(new Color(yellow)),
+                new Triangle(new Point(7,-10,0), new Point(-7,-10,0), new Point(12,-25,0))
+                        .setEmission(new Color(yellow)),
+                new Triangle(new Point(7,-10,0), new Point(-7,-10,0), new Point(-12,-25,0))
+                        .setEmission(new Color(yellow)),
+                new Triangle(new Point(15,30,0), new Point(15,10,0), new Point(30,-5,0))
+                        .setEmission(new Color(red)),
+                new Triangle(new Point(-15,30,0), new Point(-15,10,0), new Point(-30,-5,0))
+                        .setEmission(new Color(red)),
+                new Circle(new Point(0,50,30), new Vector(0,0,1), 9)
+                        .setEmission(new Color(171,232,244)),
+                new Circle(new Point(0,50,30), new Vector(0,0,1), 11,3)
+                        .setEmission(new Color(white))
+        );
+
+
+        // adding planets to the sphere
+        scene2.geometries.add(new Sphere(new Point(100,80,-20),20)
+                        .setEmission(new Color(175,216,47))
+                        .setMaterial(new Material().setKr(0.1)),
+                new Circle(new Point(100,80,-20), new Vector(1,5,0), 40, 5)
+                        .setEmission(new Color(88,88,88)));
+
+        // the earth
+        scene2.geometries.add(new Sphere(new Point(80,-10,-30),20)
+                .setEmission(new Color(0,168,243))
+                .setMaterial(new Material().setKr(0.1)));
+
+
+
+        scene2.geometries.add(new Sphere(new Point(-80,60,-70),17)
+                .setEmission(new Color(255,127,39))
+                .setMaterial(new Material().setKr(0.1).setKs(0.4)));
+
+        scene2.geometries.add(new Sphere(new Point(-100,-35,-60),20)
+                        .setEmission(new Color(162,234,232)).setMaterial(new Material().setKr(0.1)),
+                new Circle(new Point(-100,-35,-60), new Vector(-1,-3,0),35,5)
+                        .setEmission(new Color(50,160,223)));
+
+        scene2.geometries.add(new Sphere(new Point(-110,125,-60),20)
+                .setEmission(new Color(255,0,24))
+                .setMaterial(new Material().setKd(0.1).setKr(0.1)));
+
+        // the sun
+        scene2.geometries.add(new Sphere(new Point(-10,-100,60),40)
+                        .setEmission(new Color(255,242,0))
+                        .setMaterial(new Material().setKt(0.7)),
+                new Sphere(new Point(-10,-100,60),32)
+                        .setEmission(new Color(255,200,0))
+                        .setMaterial(new Material().setKt(0.7)),
+                new Sphere(new Point(-10,-100,60),20)
+                        .setEmission(new Color(255,150,0)));
+
+
+        // the moon
+        scene2.geometries.add(new Sphere(new Point(100,-120,20),25)
+                .setEmission(new Color(234,234,234))
+                .setMaterial(new Material().setKs(0.1)));
+
+
+
+        // adding flag to the moon
+        scene2.geometries.add(new Square(new Point(102,-95,20), new Point(104,-95,20)
+                        , new Point(104,-85,20), new Point(102,-85,20))
+                        .setEmission(new Color(231,105,33)),
+                new Square(new Point(104,-85,20), new Point(104,-65,20),
+                        new Point(80,-65,20), new Point(80,-85,20))
+                        .setEmission(new Color(white)),
+                new Triangle(new Point(98,-72,22), new Point(86,-72,22),new Point(92,-80,22))
+                        .setEmission(new Color(36,49,234)),
+                new Triangle(new Point(86,-78,22),new Point(98,-78,22), new Point(92,-70,22))
+                        .setEmission(new Color(36,49,234)),
+                new Square(new Point(80,-67,22), new Point(104,-67,22), new Point(104,-69,22),new Point(80,-69,22))
+                        .setEmission(new Color(36,49,234)),
+                new Square(new Point(80,-82,22), new Point(104,-82,22), new Point(104,-84,22),new Point(80,-84,22))
+                        .setEmission(new Color(36,49,234)));
+
+
+        scene2.lights.add(new SpotLight(new Color(200, 0, 280), new Point(-100, -100, 500), new Vector(-1, -1, -2)) //
+                .setKl(0.0004).setKq(0.0000006));
+        scene2.lights.add(new DirectionalLight(new Color(100, 0, 100), new Vector(0, 0, -1)));
+        scene2.lights.add(new PointLight(new Color(0, 200, 20), new Point(70, 100, 250)));
+
+        camera2.setImageWriter(new ImageWriter("picture2MP1", 500, 500)) //
+                .setRayTracer(new RayTracerBasic(scene2)) //
+                .renderImage() //
+                .writeToImage();
+    }
 
 
 }
