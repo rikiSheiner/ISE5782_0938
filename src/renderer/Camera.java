@@ -83,7 +83,7 @@ public class Camera {
     private boolean is_ASS = false;
     /**
      * the minimal difference between the average color to the color of the sample
-     * for continuation of sampling
+     * for continuation of sampling in ASS
      */
     private final int MIN_DIF = 10;
 
@@ -460,15 +460,14 @@ public class Camera {
         double Yi = (i - nY / 2d) * Ry + Ry / 2d;
         double Xj = (j - nX / 2d) * Rx + Rx / 2d;
 
-
         Point p = Pc.add(vRight.scale(Xj)).subtract(vUp.scale(Yi)); // the center of pixel (j,i)
 
         return calcColor_ASS(Rx,Ry,4,p);
-
     }
 
     /**
-     *
+     * Function calcColor_ASS is used for calculating the color of pixel using
+     * adaptive super sampling
      * @param Rx - the height of subpixel in the view plane
      * @param Ry - the width of subpixel in the view plane
      * @param depth - the maximal level of recursion in sampling of subpixel
@@ -479,6 +478,7 @@ public class Camera {
         List<Ray> rays = new LinkedList<>(); // the beam of rays through the samples
         List<Color> colors = new LinkedList<>(); // list of the colors of the samples
         Color avgColor = new Color (0,0,0); // the average color of the samples
+        Point newPc; // the center of the new subpixel
 
         // taking of samples from the 4 corners of the subpixel
         Point tmp = new Point(pc.getXyz().getD1() +Rx/2, pc.getXyz().getD2() + Ry/2, pc.getXyz().getD3());
@@ -493,42 +493,51 @@ public class Camera {
         // calculating of the average color of the samples
         for(int k = 0; k < rays.size(); k++){
             colors.add(rayTracer.traceRay(rays.get(k)));
-            avgColor = avgColor.add(rayTracer.traceRay(rays.get(k)));
+            avgColor = avgColor.add(colors.get(k));
         }
         avgColor.reduce(rays.size());
 
         if(depth == 0) // this is the max possible level of recursion
+        {
+            // adding the center of the subpixel to the calculation of the color
+            avgColor = avgColor.scale(4).add(rayTracer.traceRay(new Ray(p0,pc.subtract(p0))));
+            avgColor.reduce(5);
             return avgColor;
+        }
 
 
         // If the color of the first sample is very different from the average color
         // we will continue to sample in the upper right sub-pixel
         if(avgColor.diff(colors.get(0)) > MIN_DIF){
-            pc = new Point(pc.getXyz().getD1() +Rx/4, pc.getXyz().getD2() + Ry/4, pc.getXyz().getD3());;
-            colors.set(0, calcColor_ASS(Rx/2, Ry/2,depth-1,  pc));
+            newPc = new Point(pc.getXyz().getD1() +Rx/4, pc.getXyz().getD2() + Ry/4, pc.getXyz().getD3());;
+            colors.set(0, calcColor_ASS(Rx/2, Ry/2,depth-1,  newPc));
         }
 
         // If the color of the second sample is very different from the average color
         // we will continue to sample in the lower right sub-pixel
         if(avgColor.diff(colors.get(1)) > MIN_DIF){
-            pc = new Point(pc.getXyz().getD1() +Rx/4, pc.getXyz().getD2() - Ry/4, pc.getXyz().getD3());;
-            colors.set(0, calcColor_ASS(Rx/2, Ry/2,depth-1,  pc));
+            newPc = new Point(pc.getXyz().getD1() +Rx/4, pc.getXyz().getD2() - Ry/4, pc.getXyz().getD3());;
+            colors.set(1, calcColor_ASS(Rx/2, Ry/2,depth-1,  newPc));
         }
 
         // If the color of the third sample is very different from the average color
         // we will continue to sample in the upper left sub-pixel
         if(avgColor.diff(colors.get(2)) > MIN_DIF){
-            pc = new Point(pc.getXyz().getD1() -Rx/4, pc.getXyz().getD2() + Ry/4, pc.getXyz().getD3());;
-            colors.set(0, calcColor_ASS(Rx/2, Ry/2,depth-1,  pc));
+            newPc = new Point(pc.getXyz().getD1() -Rx/4, pc.getXyz().getD2() + Ry/4, pc.getXyz().getD3());;
+            colors.set(2, calcColor_ASS(Rx/2, Ry/2,depth-1,  newPc));
         }
 
         // If the color of the fourth sample is very different from the average color
         // we will continue to sample in the lower left sub-pixel
         if(avgColor.diff(colors.get(3)) > MIN_DIF){
-            pc = new Point(pc.getXyz().getD1() -Rx/4, pc.getXyz().getD2() - Ry/4, pc.getXyz().getD3());;
-            colors.set(0, calcColor_ASS( Rx/2, Ry/2, depth-1,  pc));
+            newPc = new Point(pc.getXyz().getD1() -Rx/4, pc.getXyz().getD2() - Ry/4, pc.getXyz().getD3());;
+            colors.set(3, calcColor_ASS( Rx/2, Ry/2, depth-1,  newPc));
         }
 
+
+        // adding the center of the subpixel to the calculation of the color
+        avgColor = avgColor.scale(4).add(rayTracer.traceRay(new Ray(p0,pc.subtract(p0))));
+        avgColor.reduce(5);
         return avgColor;
 
     }

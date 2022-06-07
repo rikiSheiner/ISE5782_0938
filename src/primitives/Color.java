@@ -152,8 +152,7 @@ public class Color {
      * @return double  - difference
      */
     public double diff(Color other){
-        double dif = 0;
-        dif+=this.getColor().getRed()-other.getColor().getRed()+
+        double dif = this.getColor().getRed()-other.getColor().getRed()+
                 this.getColor().getGreen()-other.getColor().getGreen()+
                 this.getColor().getBlue()-other.getColor().getBlue();
 
