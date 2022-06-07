@@ -161,7 +161,7 @@ public class FinalPictureTests {
     @Test
     public void picture2ForMP1() {
         Scene scene2 = new Scene("MP1 picture2 scene").setBackground(new Color(13, 38, 122));
-        Camera camera2 = new Camera(new Point(0, 0, 1000), new Vector(0, 0, -1), new Vector(0, 1, 0), 1.5, 600, true, 125) //
+        Camera camera2 = new Camera(new Point(0, 0, 1000), new Vector(0, 0, -1), new Vector(0, 1, 0), 1.5, 600, true, 81) //
                 .setVPSize(300, 300).setVPDistance(1000).setNumThreads(3);
 
 
@@ -169,7 +169,7 @@ public class FinalPictureTests {
         scene2.geometries.add(new Cylinder(new Ray(new Point(0,0,0), new Vector(0,1,0)),15,65)
                         .setEmission(new Color(orange)),
                 new Cone(30, 15, new Point(0,65,0))
-                        .setEmission(new Color(red)),
+                        .setEmission(new Color(red)).setMaterial(new Material().setKs(0.7)),
                 new Square(new Point(12,0,0), new Point(-12,0,0),new Point(-12,-5,0), new Point(12,-5,0))
                         .setEmission(new Color(red)),
                 new Square(new Point(7,-10,0), new Point(-7,-10,0),new Point(-7,-5,0), new Point(7,-5,0))
@@ -190,6 +190,39 @@ public class FinalPictureTests {
                         .setEmission(new Color(white))
         );
 
+        scene2.lights.add(new SpotLight(new Color(255,242,0), new Point(0,110,0), new Vector(0,0,-1)));
+
+
+        int x = 230, z = -1000,eps = -3;
+        for(int i = 0; i < 2; i++){
+            // adding spaceship to the scene
+            scene2.geometries.add(new Square(new Point(15+x,0,z), new Point(-15+x,0,z),new Point(-15+x,65,z), new Point(15+x,65,z))
+                            .setEmission(new Color(orange)),
+                    new Cone(30, 15, new Point(0+x,65,0+z))
+                            .setEmission(new Color(red)),
+                    new Square(new Point(12+x,0,0+z), new Point(-12+x,0,0+z),new Point(-12+x,-5,0+z), new Point(12+x,-5,0+z))
+                            .setEmission(new Color(red)),
+                    new Square(new Point(7+x,-10,0+z), new Point(-7+x,-10,0+z),new Point(-7+x,-5,0+z), new Point(7+x,-5,0+z))
+                            .setEmission(new Color(gray)),
+                    new Triangle(new Point(7+x,-10,0+z), new Point(-7+x,-10,0+z), new Point(0+x,-40,0+z))
+                            .setEmission(new Color(yellow)),
+                    new Triangle(new Point(7+x,-10,0+z), new Point(-7+x,-10,0+z), new Point(12+x,-25,0+z))
+                            .setEmission(new Color(yellow)),
+                    new Triangle(new Point(7+x,-10,0+z), new Point(-7+x,-10,0+z), new Point(-12+x,-25,0+z))
+                            .setEmission(new Color(yellow)),
+                    new Triangle(new Point(15+x,30,0+z), new Point(15+x,10,0+z), new Point(30+x,-5,0+z))
+                            .setEmission(new Color(red)),
+                    new Triangle(new Point(-15+x,30,0+z), new Point(-15+x,10,0+z), new Point(-30+x,-5,0+z))
+                            .setEmission(new Color(red)),
+                    new Circle(new Point(eps+x,50,30+z), new Vector(0,0,1), 9)
+                            .setEmission(new Color(171,232,244)),
+                    new Circle(new Point(eps+x,50,30+z), new Vector(0,0,1), 11,3)
+                            .setEmission(new Color(white))
+            );
+
+            x = -230; z = -700;eps = 3;
+        }
+
 
         // adding planets to the sphere
         scene2.geometries.add(new Sphere(new Point(100,80,-20),20)
@@ -204,7 +237,6 @@ public class FinalPictureTests {
                 .setMaterial(new Material().setKr(0.1)));
 
 
-
         scene2.geometries.add(new Sphere(new Point(-80,60,-70),17)
                 .setEmission(new Color(255,127,39))
                 .setMaterial(new Material().setKr(0.1).setKs(0.4)));
@@ -214,19 +246,24 @@ public class FinalPictureTests {
                 new Circle(new Point(-100,-35,-60), new Vector(-1,-3,0),35,5)
                         .setEmission(new Color(50,160,223)));
 
+        scene2.lights.add(new PointLight(new Color(255,242,0), new Point(-110,125,-60)));
         scene2.geometries.add(new Sphere(new Point(-110,125,-60),20)
                 .setEmission(new Color(255,0,24))
-                .setMaterial(new Material().setKd(0.1).setKr(0.1)));
+                .setMaterial(new Material().setKr(0.1).setKd(0.5)));
 
         // the sun
         scene2.geometries.add(new Sphere(new Point(-10,-100,60),40)
                         .setEmission(new Color(255,242,0))
-                        .setMaterial(new Material().setKt(0.7)),
+                        .setMaterial(new Material().setKt(0.7).setKd(0.3)),
                 new Sphere(new Point(-10,-100,60),32)
                         .setEmission(new Color(255,200,0))
                         .setMaterial(new Material().setKt(0.7)),
                 new Sphere(new Point(-10,-100,60),20)
                         .setEmission(new Color(255,150,0)));
+
+
+        scene2.lights.add(new SpotLight(new Color(255,42,0), new Point(-10,-30,60), new Vector(0,0,-1)));
+
 
 
         // the moon
@@ -267,8 +304,8 @@ public class FinalPictureTests {
     @Test
     public void pictureMP2(){
         Scene scene3 = new Scene("MP2 scene").setBackground(new Color(0,200,216));
-        Camera camera3 = new Camera(new Point(0, 0, 1000), new Vector(0, 0, -1), new Vector(0, 1, 0),1.5,800,true,1) //
-                .setVPSize(600, 600).setVPDistance(1000);
+        Camera camera3 = new Camera(new Point(0, 0, 1000), new Vector(0, 0, -1), new Vector(0, 1, 0),1.5,800,true,125) //
+                .setVPSize(600, 600).setVPDistance(1000).setNumThreads(4);
 
 
         // adding middle path
