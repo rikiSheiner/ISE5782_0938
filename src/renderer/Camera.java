@@ -57,7 +57,7 @@ public class Camera {
      */
     private int numSamples;
     /**
-     * indicates is we want to render with the effect of depth of field or not
+     * indicates whether we want to render with the effect of depth of field or not
      */
     private boolean isDepthOfField;
     /**
@@ -77,6 +77,16 @@ public class Camera {
      * the maximal level of multi threading which can be used for rendering the pictures
      */
     private final int MAX_NUM_THREADS = 4;
+    /**
+     * indicates whether we use the method of adaptive super sampling or not
+     */
+    private boolean is_ASS = false;
+    /**
+     * the minimal difference between the average color to the color of the sample
+     * for continuation of sampling
+     */
+    private final int MIN_DIF = 10;
+
 
 
     /**
@@ -247,6 +257,7 @@ public class Camera {
     }
 
 
+
     //------------------------------------------ getters -----------------------------------------------------
     public double getHeight() {
         return height;
@@ -293,6 +304,10 @@ public class Camera {
         this.numThreads = numThreads;
         return this;
     }
+    public Camera setIs_ASS(boolean is_ASS) {
+        this.is_ASS = is_ASS;
+        return this;
+    }
 
     //------------------------------------------ constructors of rays -----------------------------------------------------
     /**
@@ -333,16 +348,15 @@ public class Camera {
      * @param i  - the index on Y axis
      * @return List of Ray
      */
-    public List<Ray> constructRaysThroughPixel(int nX, int nY, int j, int i)
-    {
+    public List<Ray> constructRaysThroughPixel(int nX, int nY, int j, int i) {
         Ray ray = constructRay( nX,  nY, j,  i); // ray through the center of pixel (j,i)
 
-        // only the effect of anti aliasing is active
-        if(this.isDepthOfField == false)
-            return constructRaysForAntiAliasing(nX,nY,j,i);
-
         // the effect of depth of field is active
-        return constructRaysForDepthOfField(ray);
+        if(this.isDepthOfField)
+            return constructRaysForDepthOfField(ray);
+
+        // only the effect of anti aliasing is active
+        return constructRaysForAntiAliasing(nX,nY,j,i);
     }
 
     /**
@@ -408,8 +422,7 @@ public class Camera {
      * @param ray - the ray which passes through the center of the pixel
      * @return List of Ray
      */
-    public List<Ray> constructRaysForDepthOfField(Ray ray)
-    {
+    public List<Ray> constructRaysForDepthOfField(Ray ray) {
         Point focalPoint = this.findFocalPoint(ray); // the focal point of the camera
         List<Ray> rays = new LinkedList<>();
         Random random = new Random();
@@ -427,6 +440,97 @@ public class Camera {
         }
 
         return rays;
+    }
+
+    /**
+     * Function calcColor_ASS is used for calculating the color of pixel using
+     * adaptive super sampling
+     * @param nX - the number of pixels in X axis
+     * @param nY - the number of pixels in Y axis
+     * @param j  - the index on X axis
+     * @param i  - the index on Y axis
+     * @return Color of pixel (j,i)
+     */
+    public Color calcColor_ASS(int nX, int nY, int j, int i){
+        Point Pc = p0.add(vTo.scale(distance)); // the center point of the view plane
+
+        double Ry = height / nY; // the height of pixel in the view plane
+        double Rx = width / nX; // the width of pixel in the view plane
+
+        double Yi = (i - nY / 2d) * Ry + Ry / 2d;
+        double Xj = (j - nX / 2d) * Rx + Rx / 2d;
+
+
+        Point p = Pc.add(vRight.scale(Xj)).subtract(vUp.scale(Yi)); // the center of pixel (j,i)
+
+        return calcColor_ASS(Rx,Ry,4,p);
+
+    }
+
+    /**
+     *
+     * @param Rx - the height of subpixel in the view plane
+     * @param Ry - the width of subpixel in the view plane
+     * @param depth - the maximal level of recursion in sampling of subpixel
+     * @param pc - the center point of the subpixel
+     * @return Color - the color of the pixel calculated by ASS
+     */
+    private Color calcColor_ASS(double Rx, double Ry, int depth, Point pc){
+        List<Ray> rays = new LinkedList<>(); // the beam of rays through the samples
+        List<Color> colors = new LinkedList<>(); // list of the colors of the samples
+        Color avgColor = new Color (0,0,0); // the average color of the samples
+
+        // taking of samples from the 4 corners of the subpixel
+        Point tmp = new Point(pc.getXyz().getD1() +Rx/2, pc.getXyz().getD2() + Ry/2, pc.getXyz().getD3());
+        rays.add(new Ray(p0, tmp.subtract(p0).normalize()));
+        tmp = new Point(pc.getXyz().getD1() +Rx/2, pc.getXyz().getD2() - Ry/2, pc.getXyz().getD3());
+        rays.add(new Ray(p0, tmp.subtract(p0).normalize()));
+        tmp = new Point(pc.getXyz().getD1() -Rx/2, pc.getXyz().getD2() + Ry/2, pc.getXyz().getD3());
+        rays.add(new Ray(p0, tmp.subtract(p0).normalize()));
+        tmp = new Point(pc.getXyz().getD1() -Rx/2, pc.getXyz().getD2() - Ry/2, pc.getXyz().getD3());
+        rays.add(new Ray(p0, tmp.subtract(p0).normalize()));
+
+        // calculating of the average color of the samples
+        for(int k = 0; k < rays.size(); k++){
+            colors.add(rayTracer.traceRay(rays.get(k)));
+            avgColor = avgColor.add(rayTracer.traceRay(rays.get(k)));
+        }
+        avgColor.reduce(rays.size());
+
+        if(depth == 0) // this is the max possible level of recursion
+            return avgColor;
+
+
+        // If the color of the first sample is very different from the average color
+        // we will continue to sample in the upper right sub-pixel
+        if(avgColor.diff(colors.get(0)) > MIN_DIF){
+            pc = new Point(pc.getXyz().getD1() +Rx/4, pc.getXyz().getD2() + Ry/4, pc.getXyz().getD3());;
+            colors.set(0, calcColor_ASS(Rx/2, Ry/2,depth-1,  pc));
+        }
+
+        // If the color of the second sample is very different from the average color
+        // we will continue to sample in the lower right sub-pixel
+        if(avgColor.diff(colors.get(1)) > MIN_DIF){
+            pc = new Point(pc.getXyz().getD1() +Rx/4, pc.getXyz().getD2() - Ry/4, pc.getXyz().getD3());;
+            colors.set(0, calcColor_ASS(Rx/2, Ry/2,depth-1,  pc));
+        }
+
+        // If the color of the third sample is very different from the average color
+        // we will continue to sample in the upper left sub-pixel
+        if(avgColor.diff(colors.get(2)) > MIN_DIF){
+            pc = new Point(pc.getXyz().getD1() -Rx/4, pc.getXyz().getD2() + Ry/4, pc.getXyz().getD3());;
+            colors.set(0, calcColor_ASS(Rx/2, Ry/2,depth-1,  pc));
+        }
+
+        // If the color of the fourth sample is very different from the average color
+        // we will continue to sample in the lower left sub-pixel
+        if(avgColor.diff(colors.get(3)) > MIN_DIF){
+            pc = new Point(pc.getXyz().getD1() -Rx/4, pc.getXyz().getD2() - Ry/4, pc.getXyz().getD3());;
+            colors.set(0, calcColor_ASS( Rx/2, Ry/2, depth-1,  pc));
+        }
+
+        return avgColor;
+
     }
 
 
@@ -454,19 +558,26 @@ public class Camera {
                 }
             }
         }
+        else if(is_ASS){ // adaptive super sampling
+            for (int i = 0; i < nY; i++) {
+                for (int j = 0; j < nX; j++) {
+                    imageWriter.writePixel(j, i, calcColor_ASS(nX, nY, j, i));
+                }
+            }
+        }
         else { // super sampling
 
-            // multi threading for acceleration of performances
-            Pixel.initialize(nY, nX, Pixel.printInterval);
-            IntStream.range(0, nY).parallel().forEach(i -> {
-                IntStream.range(0, nX).parallel().forEach(j -> {
-                    List<Ray> rays = constructRaysThroughPixel(nX,nY,j,i);
-                    imageWriter.writePixel(j, i, calcColor(rays));
-                    Pixel.pixelDone();
-                    Pixel.printPixel();
+                // multi threading for acceleration of performances
+                Pixel.initialize(nY, nX, Pixel.printInterval);
+                IntStream.range(0, nY).parallel().forEach(i -> {
+                    IntStream.range(0, nX).parallel().forEach(j -> {
+                        List<Ray> rays = constructRaysThroughPixel(nX,nY,j,i);
+                        imageWriter.writePixel(j, i, calcColor(rays));
+                        Pixel.pixelDone();
+                        Pixel.printPixel();
+                    });
                 });
-            });
-        }
+            }
 
         return this;
     }
@@ -520,5 +631,6 @@ public class Camera {
             throw new MissingResourceException("Can't write to image, because of lack of producer to the picture", "Camera", "lack of imageWriter");
         this.imageWriter.writeToImage();
     }
+
 
 }

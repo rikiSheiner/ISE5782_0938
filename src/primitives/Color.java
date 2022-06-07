@@ -1,5 +1,7 @@
 package primitives;
 
+import java.util.List;
+
 /**
  * Wrapper class for java.jwt.Color The constructors operate with any
  * non-negative RGB values. The colors are maintained without upper limit of
@@ -140,6 +142,22 @@ public class Color {
         if (k.d1 < 1.0 || k.d2 < 1.0 || k.d3 < 1.0)
             throw new IllegalArgumentException("Can't scale a color by a by a number lower than 1");
         return new Color(rgb.d1 / k.d1, rgb.d2 / k.d2, rgb.d3 / k.d3);
+    }
+
+
+    /**
+     * Function diff calculates the difference between this color to other color
+     * according to the differences in the values of RGB
+     * @param other
+     * @return double  - difference
+     */
+    public double diff(Color other){
+        double dif = 0;
+        dif+=this.getColor().getRed()-other.getColor().getRed()+
+                this.getColor().getGreen()-other.getColor().getGreen()+
+                this.getColor().getBlue()-other.getColor().getBlue();
+
+        return dif;
     }
 
 }
