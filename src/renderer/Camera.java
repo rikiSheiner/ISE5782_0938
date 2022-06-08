@@ -343,26 +343,6 @@ public class Camera {
         return new Ray(p0, Pij.subtract(p0));
     }
 
-
-    /**
-     * The function constructRaysThroughPixel is used for constructing a beam of rays through pixel.
-     * @param nX - the number of pixels in X axis
-     * @param nY - the number of pixels in Y axis
-     * @param j  - the index on X axis
-     * @param i  - the index on Y axis
-     * @return List of Ray
-     */
-    public List<Ray> constructRaysThroughPixel(int nX, int nY, int j, int i) {
-        Ray ray = constructRay( nX,  nY, j,  i); // ray through the center of pixel (j,i)
-
-        // the effect of depth of field is active
-        if(this.isDepthOfField)
-            return constructRaysForDepthOfField(ray);
-
-        // only the effect of anti aliasing is active
-        return constructRaysForAntiAliasing(nX,nY,j,i);
-    }
-
     /**
      * The function constructRaysForAntiAliasing is used for creation of numSamples rays through
      * specific pixel in the view plane for anti aliasing in the picture.
@@ -374,7 +354,6 @@ public class Camera {
      * @return List of Ray
      */
     public List<Ray> constructRaysForAntiAliasing(int nX, int nY, int j, int i) {
-
         // super sampling - random access
 
         Point Pc = p0.add(vTo.scale(distance)); // the center point of the view plane
@@ -569,7 +548,18 @@ public class Camera {
         else { // super sampling
             // using in multi threading for acceleration of performances
 
-            if(is_ASS){ // adaptive super sampling
+            if(isDepthOfField){ // depth of field
+                Pixel.initialize(nY, nX, Pixel.printInterval);
+                IntStream.range(0, nY).parallel().forEach(i -> {
+                    IntStream.range(0, nX).parallel().forEach(j -> {
+                        List<Ray> rays = constructRaysForDepthOfField(constructRay( nX,  nY, j,  i));
+                        imageWriter.writePixel(j, i, calcColor(rays));
+                        Pixel.pixelDone();
+                        Pixel.printPixel();
+                    });
+                });
+            }
+            else if(is_ASS){ // adaptive super sampling
                 Pixel.initialize(nY, nX, Pixel.printInterval);
                 IntStream.range(0, nY).parallel().forEach(i -> {
                     IntStream.range(0, nX).parallel().forEach(j -> {
@@ -579,11 +569,11 @@ public class Camera {
                     });
                 });
             }
-            else { // anti aliasing or depth of field
+            else{ // anti aliasing
                 Pixel.initialize(nY, nX, Pixel.printInterval);
                 IntStream.range(0, nY).parallel().forEach(i -> {
                     IntStream.range(0, nX).parallel().forEach(j -> {
-                        List<Ray> rays = constructRaysThroughPixel(nX,nY,j,i);
+                        List<Ray> rays = constructRaysForAntiAliasing(nX,nY,j,i);
                         imageWriter.writePixel(j, i, calcColor(rays));
                         Pixel.pixelDone();
                         Pixel.printPixel();
