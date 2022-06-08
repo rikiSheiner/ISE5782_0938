@@ -62,7 +62,7 @@ public class Cylinder extends Tube {
         if (t1>t2) t = t2;
         else t = t1;
 
-        double r = pos.getD2() + t*dir.getXyz().getD2();
+        double r = pos.getD2() + t * dir.getXyz().getD2();
 
         if ((r >= center.getXyz().getD2()) && (r <= center.getXyz().getD2() + height))
             return List.of(new GeoPoint(this, ray.getPoint(t)));

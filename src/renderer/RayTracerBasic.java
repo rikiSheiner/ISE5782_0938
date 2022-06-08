@@ -214,7 +214,7 @@ public class RayTracerBasic extends RayTracerBase{
 
         double ktr = 1.0;
         //loop over intersections and for each intersection which is closer to the
-        //point than the light source multiply ktr by 𝒌𝑻 of its geometry
+        //point than the light source multiply ktr by kT of its geometry
         for(GeoPoint gp : intersections){
             if(alignZero( gp.point.distance(geopoint.point) - lightDistance ) <= 0){
                 ktr *= gp.geometry.getMaterial().kT.getD1();
@@ -245,7 +245,7 @@ public class RayTracerBasic extends RayTracerBase{
      * @return Ray - the reflected ray
      */
     private Ray constructReflectedRay(Point p, Vector v, Vector n){
-        //𝒓 = 𝒗 − 𝟐 ∙ (𝒗 ∙ 𝒏) ∙ 𝒏
+        // r = v - 2 * (v * n) * n
         double vn = v.dotProduct(n);
         if(vn == 0)
             return null;

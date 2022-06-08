@@ -87,8 +87,12 @@ public class RenderTests {
         camera.writeToImage();
     }
 
+
     /**
      * Test for XML based scene - for bonus
+     * @throws ParserConfigurationException
+     * @throws IOException
+     * @throws SAXException
      */
     @Test
     public void basicRenderXml() throws ParserConfigurationException, IOException, SAXException {

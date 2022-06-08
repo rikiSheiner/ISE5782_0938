@@ -1,7 +1,5 @@
 package primitives;
 
-import java.util.List;
-
 /**
  * Wrapper class for java.jwt.Color The constructors operate with any
  * non-negative RGB values. The colors are maintained without upper limit of
@@ -152,11 +150,13 @@ public class Color {
      * @return double  - difference
      */
     public double diff(Color other){
-        double dif = this.getColor().getRed()-other.getColor().getRed()+
-                this.getColor().getGreen()-other.getColor().getGreen()+
-                this.getColor().getBlue()-other.getColor().getBlue();
-
-        return dif;
+        double rr = rgb.d1;
+        double rg = rgb.d2;
+        double rb = rgb.d3;
+        rr -= other.rgb.d1;
+        rg -= other.rgb.d2;
+        rb -= other.rgb.d3;
+        return rr + rg + rb;
     }
 
 }

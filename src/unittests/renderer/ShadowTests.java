@@ -17,18 +17,34 @@ import scene.Scene;
  * @author Dan
  */
 public class ShadowTests {
+    /**
+     * geometry body in the scene
+     */
     private Intersectable sphere = new Sphere(new Point(0, 0, -200), 60d) //
             .setEmission(new Color(BLUE)) //
             .setMaterial(new Material().setKd(0.5).setKs(0.5).setShininess(30));
+    /**
+     * general material for geometries in the scene
+     */
     private Material trMaterial = new Material().setKd(0.5).setKs(0.5).setShininess(30);
 
+    /**
+     * the scene which the camera takes a picture of
+     */
     private Scene scene = new Scene("Test scene");
+    /**
+     * the camera which takes a picture of the scene
+     */
     private Camera camera = new Camera(new Point(0, 0, 1000), new Vector(0, 0, -1), new Vector(0, 1, 0)) //
             .setVPSize(200, 200).setVPDistance(1000) //
             .setRayTracer(new RayTracerBasic(scene));
 
+
     /**
      * Helper function for the tests in this module
+     * @param pictName - the name of the picture
+     * @param triangle - the triangle in the picture
+     * @param spotLocation - the location of the spot-light in the scene
      */
     void sphereTriangleHelper(String pictName, Triangle triangle, Point spotLocation) {
         scene.geometries.add(sphere, triangle.setEmission(new Color(BLUE)).setMaterial(trMaterial));
