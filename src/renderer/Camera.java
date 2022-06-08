@@ -82,10 +82,10 @@ public class Camera {
      */
     private boolean is_ASS = false;
     /**
-     * the minimal difference between the average color to the color of the sample
-     * for continuation of sampling in ASS
+     * the maximal difference between the average color to the color of the sample
+     * for stopping of sampling in ASS
      */
-    private final int MIN_DIF = 10;
+    private final int MAX_DIF = 10;
 
 
 
@@ -304,6 +304,10 @@ public class Camera {
         this.numThreads = numThreads;
         return this;
     }
+    public Camera setDepthOfField(boolean depthOfField) {
+        isDepthOfField = depthOfField;
+        return this;
+    }
     public Camera setIs_ASS(boolean is_ASS) {
         this.is_ASS = is_ASS;
         return this;
@@ -406,8 +410,7 @@ public class Camera {
      * @param ray - the ray that through the center of the pixel
      * @return Point - focal point of the camera
      */
-    public Point findFocalPoint(Ray ray)
-    {
+    public Point findFocalPoint(Ray ray) {
         // calculating of focal point by multiplying
         // the ray direction by the focal length
         return ray.getPoint(focalLength);
@@ -462,7 +465,7 @@ public class Camera {
 
         Point p = Pc.add(vRight.scale(Xj)).subtract(vUp.scale(Yi)); // the center of pixel (j,i)
 
-        return calcColor_ASS(Rx,Ry,4,p);
+        return calcColor_ASS(Rx,Ry,5,p);
     }
 
     /**
@@ -495,49 +498,45 @@ public class Camera {
             colors.add(rayTracer.traceRay(rays.get(k)));
             avgColor = avgColor.add(colors.get(k));
         }
-        avgColor.reduce(rays.size());
+        avgColor = avgColor.reduce(colors.size());
 
         if(depth == 0) // this is the max possible level of recursion
-        {
-            // adding the center of the subpixel to the calculation of the color
-            avgColor = avgColor.scale(4).add(rayTracer.traceRay(new Ray(p0,pc.subtract(p0))));
-            avgColor.reduce(5);
             return avgColor;
-        }
-
 
         // If the color of the first sample is very different from the average color
         // we will continue to sample in the upper right sub-pixel
-        if(avgColor.diff(colors.get(0)) > MIN_DIF){
+        if(Math.abs(avgColor.diff(colors.get(0))) > MAX_DIF){
             newPc = new Point(pc.getXyz().getD1() +Rx/4, pc.getXyz().getD2() + Ry/4, pc.getXyz().getD3());;
             colors.set(0, calcColor_ASS(Rx/2, Ry/2,depth-1,  newPc));
         }
 
         // If the color of the second sample is very different from the average color
         // we will continue to sample in the lower right sub-pixel
-        if(avgColor.diff(colors.get(1)) > MIN_DIF){
+        if(Math.abs(avgColor.diff(colors.get(1))) > MAX_DIF){
             newPc = new Point(pc.getXyz().getD1() +Rx/4, pc.getXyz().getD2() - Ry/4, pc.getXyz().getD3());;
             colors.set(1, calcColor_ASS(Rx/2, Ry/2,depth-1,  newPc));
         }
 
         // If the color of the third sample is very different from the average color
         // we will continue to sample in the upper left sub-pixel
-        if(avgColor.diff(colors.get(2)) > MIN_DIF){
+        if(Math.abs(avgColor.diff(colors.get(2))) > MAX_DIF){
             newPc = new Point(pc.getXyz().getD1() -Rx/4, pc.getXyz().getD2() + Ry/4, pc.getXyz().getD3());;
             colors.set(2, calcColor_ASS(Rx/2, Ry/2,depth-1,  newPc));
         }
 
         // If the color of the fourth sample is very different from the average color
         // we will continue to sample in the lower left sub-pixel
-        if(avgColor.diff(colors.get(3)) > MIN_DIF){
+        if(Math.abs(avgColor.diff(colors.get(3))) > MAX_DIF){
             newPc = new Point(pc.getXyz().getD1() -Rx/4, pc.getXyz().getD2() - Ry/4, pc.getXyz().getD3());;
             colors.set(3, calcColor_ASS( Rx/2, Ry/2, depth-1,  newPc));
         }
 
-
-        // adding the center of the subpixel to the calculation of the color
-        avgColor = avgColor.scale(4).add(rayTracer.traceRay(new Ray(p0,pc.subtract(p0))));
-        avgColor.reduce(5);
+        // calculating the average color of the samples
+        avgColor = new Color(0,0,0);
+        for(int k = 0; k < colors.size(); k++){
+            avgColor = avgColor.add(colors.get(k));
+        }
+        avgColor = avgColor.reduce(colors.size());
         return avgColor;
 
     }
@@ -567,16 +566,20 @@ public class Camera {
                 }
             }
         }
-        else if(is_ASS){ // adaptive super sampling
-            for (int i = 0; i < nY; i++) {
-                for (int j = 0; j < nX; j++) {
-                    imageWriter.writePixel(j, i, calcColor_ASS(nX, nY, j, i));
-                }
-            }
-        }
         else { // super sampling
+            // using in multi threading for acceleration of performances
 
-                // multi threading for acceleration of performances
+            if(is_ASS){ // adaptive super sampling
+                Pixel.initialize(nY, nX, Pixel.printInterval);
+                IntStream.range(0, nY).parallel().forEach(i -> {
+                    IntStream.range(0, nX).parallel().forEach(j -> {
+                        imageWriter.writePixel(j, i, calcColor_ASS(nX, nY, j, i));
+                        Pixel.pixelDone();
+                        Pixel.printPixel();
+                    });
+                });
+            }
+            else { // anti aliasing or depth of field
                 Pixel.initialize(nY, nX, Pixel.printInterval);
                 IntStream.range(0, nY).parallel().forEach(i -> {
                     IntStream.range(0, nX).parallel().forEach(j -> {
@@ -587,6 +590,7 @@ public class Camera {
                     });
                 });
             }
+        }
 
         return this;
     }
