@@ -103,7 +103,7 @@ public class Tube extends Geometry{
         c_to_o = ray.getP0().subtract(this.axisRay.getP0());
         a = new_ray.getDir().dotProduct(new_ray.getDir());
         b = 2 * (new_ray.getDir().dotProduct(c_to_o.crossProduct(rot)));
-        c = (c_to_o.crossProduct(rot)).dotProduct(c_to_o.crossProduct(rot))-Math.pow(this.radius, 2);
+        c = (c_to_o.crossProduct(rot)).dotProduct(c_to_o.crossProduct(rot)) - Math.pow(this.radius, 2);
         delta = Math.pow(b, 2) - 4 * c * a;
 
         if (delta < 0)
@@ -116,13 +116,13 @@ public class Tube extends Geometry{
 
         List<GeoPoint> intersections = new LinkedList<>();
         Point point = ray.getPoint(t1);
-        if(point.distance(ray.getP0()) <= maxDistance)
+        if (point.distance(ray.getP0()) <= maxDistance)
             intersections.add(new GeoPoint(this, point));
         point = ray.getPoint(t2);
-        if(point.distance(ray.getP0()) <= maxDistance)
+        if (point.distance(ray.getP0()) <= maxDistance)
             intersections.add(new GeoPoint(this, point));
 
-        if(intersections.size() > 0)
+        if (intersections.size() > 0)
             return intersections;
 
         return null;
