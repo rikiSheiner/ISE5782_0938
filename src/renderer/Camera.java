@@ -304,10 +304,6 @@ public class Camera {
         this.numThreads = numThreads;
         return this;
     }
-    public Camera setDepthOfField(boolean depthOfField) {
-        isDepthOfField = depthOfField;
-        return this;
-    }
     public Camera setIs_ASS(boolean is_ASS) {
         this.is_ASS = is_ASS;
         return this;

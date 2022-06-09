@@ -1,18 +1,13 @@
 package unittests.renderer;
 
 import geometries.*;
-import lighting.DirectionalLight;
-import lighting.PointLight;
-import lighting.SpotLight;
+import lighting.*;
 import org.junit.jupiter.api.Test;
 import primitives.*;
-import renderer.Camera;
-import renderer.ImageWriter;
-import renderer.RayTracerBasic;
+import renderer.*;
 import scene.Scene;
 
 import static java.awt.Color.*;
-import static java.awt.Color.orange;
 
 /**
  * Class FinalPictureTests is used for rendering pictures for
@@ -25,15 +20,17 @@ public class FinalPictureTests {
     public void picture1ForMP1(){
 
         Scene scene = new Scene("MP1 picture1 scene").setBackground(new Color(0,200,216));
-        Camera camera1 = new Camera(new Point(0, 0, 1000), new Vector(0, 0, -1), new Vector(0, 1, 0),1.5,800,true,125) //
+        Camera camera1 = new Camera(new Point(0, 0, 1000), new Vector(0, 0, -1), new Vector(0, 1, 0),1.5,800,true,81) //
                 .setVPSize(200, 200).setVPDistance(1000).setNumThreads(3);
 
 
         scene.geometries.add(
                 new Cone(30, 22, new Point(0,65,-100))
-                        .setEmission(new Color(216,105,41)), // roof of the tower
-                new Cylinder(new Ray(new Point(0,0,-100), new Vector(0,-1,0)), 20, 60)
-                        .setEmission(new Color(0,0,200)), // tower
+                        .setEmission(new Color(216,105,41))
+                        .setMaterial(new Material().setKd(0.3)), // roof of the tower
+                new Cylinder(new Ray(new Point(0,32,-100), new Vector(0,1,0)), 22, 67)
+                        .setEmission(new Color(0,0,200))
+                        .setMaterial(new Material().setKs(0.2)), // tower
 
                 new Square(new Point(-5,0,100), new Point(5,0,100),new Point(5,15,100),new Point(-5,15,100))
                         .setEmission(new Color(222,128,96)), // door
@@ -94,34 +91,40 @@ public class FinalPictureTests {
         scene.geometries.add(new Square(new Point(64,28,110),new Point(56,28,110),new Point(56,-5,110), new Point(64,-5,110))
                         .setEmission(new Color(179,91,31)),
                 new Circle(new Point(60,36,115), new Vector(0,0,-1), 17)
-                        .setEmission(new Color(24,200,73)));
+                        .setEmission(new Color(24,200,73))
+                        .setMaterial(new Material().setKs(0.1)));
 
         // adding oranges to the tree
         for(int i = 0; i < 2; i++){
             for(int j = 0; j< 3; j++){
                 scene.geometries.add(new Circle(new Point(60+7*i,30+7*j,120), new Vector(0,0,-1), 2)
-                                .setEmission(new Color(orange)),
+                                .setEmission(new Color(orange)).setMaterial(new Material().setKd(0.1)),
                         new Circle(new Point(60-7*i,30+7*j,120), new Vector(0,0,-1), 2)
-                                .setEmission(new Color(orange)));
+                                .setEmission(new Color(orange)).setMaterial(new Material().setKt(0.1)));
             }
         }
+
 
 
         // adding trees to the scene
         scene.geometries.add(new Square(new Point(90,28,-710),new Point(80,28,-710),new Point(80,-5,-710), new Point(90,-5,-710))
                         .setEmission(new Color(179,91,31)),
                 new Circle(new Point(85,36,-705), new Vector(0,0,-1), 17)
-                        .setEmission(new Color(24,200,73)));
+                        .setEmission(new Color(24,200,73))
+                        .setMaterial(new Material().setKs(0.1)));
 
         scene.geometries.add(new Square(new Point(50,28,-510),new Point(40,28,-510),new Point(40,-5,-510), new Point(50,-5,-510))
                         .setEmission(new Color(179,91,31)),
                 new Circle(new Point(45,36,-505), new Vector(0,0,-1), 17)
-                        .setEmission(new Color(24,200,73)));
+                        .setEmission(new Color(24,200,73))
+                        .setMaterial(new Material().setKs(0.1)));
 
         scene.geometries.add(new Square(new Point(130,28,-410),new Point(120,28,-410),new Point(120,-5,-410), new Point(130,-5,-410))
                         .setEmission(new Color(179,91,31)),
                 new Circle(new Point(125,36,-405), new Vector(0,0,-1), 17)
-                        .setEmission(new Color(24,200,73)));
+                        .setEmission(new Color(24,200,73))
+                        .setMaterial(new Material().setKd(0.1))
+        );
 
 
         int x = 6;
@@ -147,10 +150,15 @@ public class FinalPictureTests {
             stairY -= 6;
         }
 
+
+
         scene.lights.add( new SpotLight(new Color(200, 0, 280), new Point(-100, -100, 500), new Vector(-1, -1, -2)) //
                         .setKl(0.0004).setKq(0.0000006));
         scene.lights.add(new DirectionalLight(new Color(100,0,100),new Vector(0,0,-1)));
         scene.lights.add(new PointLight(new Color(0,200,20), new Point(70,100,250)));
+
+        scene.lights.add(new PointLight(new Color(255,242,0), new Point(150,100,0)));
+
 
         camera1.setImageWriter(new ImageWriter("picture1MP1", 500, 500)) //
                 .setRayTracer(new RayTracerBasic(scene)) //
@@ -158,15 +166,16 @@ public class FinalPictureTests {
                 .writeToImage();
     }
 
+
     @Test
     public void picture2ForMP1() {
         Scene scene2 = new Scene("MP1 picture2 scene").setBackground(new Color(13, 38, 122));
-        Camera camera2 = new Camera(new Point(0, 0, 1000), new Vector(0, 0, -1), new Vector(0, 1, 0), 1.5, 600, true, 81) //
+        Camera camera2 = new Camera(new Point(0, 0, 1000), new Vector(0, 0, -1), new Vector(0, 1, 0), 1.5, 500, true, 81) //
                 .setVPSize(300, 300).setVPDistance(1000).setNumThreads(3);
 
 
         // adding spaceship to the scene
-        scene2.geometries.add(new Cylinder(new Ray(new Point(0,0,0), new Vector(0,1,0)),15,65)
+        scene2.geometries.add(new Cylinder(new Ray(new Point(0,30,0), new Vector(0,1,0)),15,70)
                         .setEmission(new Color(orange)),
                 new Cone(30, 15, new Point(0,65,0))
                         .setEmission(new Color(red)).setMaterial(new Material().setKs(0.7)),
@@ -196,7 +205,8 @@ public class FinalPictureTests {
         int x = 230, z = -1000,eps = -3;
         for(int i = 0; i < 2; i++){
             // adding spaceship to the scene
-            scene2.geometries.add(new Square(new Point(15+x,0,z), new Point(-15+x,0,z),new Point(-15+x,65,z), new Point(15+x,65,z))
+            scene2.geometries.add(
+                    new Cylinder(new Ray(new Point(x,30,z), new Vector(0,1,0)),15,70)
                             .setEmission(new Color(orange)),
                     new Cone(30, 15, new Point(0+x,65,0+z))
                             .setEmission(new Color(red)),
@@ -220,7 +230,7 @@ public class FinalPictureTests {
                             .setEmission(new Color(white))
             );
 
-            x = -230; z = -700;eps = 3;
+            x = -230; z = -1300;eps = 3;
         }
 
 
@@ -261,10 +271,7 @@ public class FinalPictureTests {
                 new Sphere(new Point(-10,-100,60),20)
                         .setEmission(new Color(255,150,0)));
 
-
         scene2.lights.add(new SpotLight(new Color(255,42,0), new Point(-10,-30,60), new Vector(0,0,-1)));
-
-
 
         // the moon
         scene2.geometries.add(new Sphere(new Point(100,-120,20),25)
@@ -301,8 +308,9 @@ public class FinalPictureTests {
                 .writeToImage();
     }
 
+
     @Test
-    public void pictureMP2(){
+    public void picture1MP2(){
         Scene scene3 = new Scene("MP2 scene").setBackground(new Color(0,200,216));
         Camera camera3 = new Camera(new Point(0, 0, 1000), new Vector(0, 0, -1), new Vector(0, 1, 0),1.5,800,true,125) //
                 .setVPSize(600, 600).setVPDistance(1000).setNumThreads(4);
@@ -428,11 +436,101 @@ public class FinalPictureTests {
         scene3.lights.add(new PointLight(new Color(255,242,0), new Point(130,100,-60)));
 
 
-        camera3.setImageWriter(new ImageWriter("pictureMP2", 500, 500)) //
+        camera3.setImageWriter(new ImageWriter("picture1MP2", 500, 500)) //
                 .setRayTracer(new RayTracerBasic(scene3)) //
                 .renderImage() //
                 .writeToImage();
 
+    }
+
+
+    @Test
+    public void picture2MP2(){
+        Scene scene4 = new Scene("MP2 scene").setBackground(new Color(89,6,78));
+        Camera camera4 = new Camera(new Point(0, 0, 1000), new Vector(0, 0, -1), new Vector(0, 1, 0),1.5,800,true,125) //
+                .setVPSize(400, 400).setVPDistance(1000).setNumThreads(4);
+
+
+        // Adding towers for the disks
+        scene4.geometries.add(
+                new Cylinder(new Ray(new Point(100,-70,10), new Vector(0,10,1)),4,100)
+                        .setEmission(new Color(0,0,200)),
+                new Cylinder(new Ray(new Point(-100,-70,10), new Vector(0,10,1)),4,100)
+                        .setEmission(new Color(200,0,0)),
+                new Cylinder(new Ray(new Point(0,-70,10), new Vector(0,10,1)),4,100)
+                        .setEmission(new Color(0,150,0)));
+
+
+        // adding a base to disk towers
+        scene4.geometries.add(new Square(new Point(-150,-100,-200), new Point(180,-100,-200), new Point(130,-150,0), new Point(-170,-150,0))
+                .setEmission(new Color(0,105,105))
+                .setMaterial(new Material().setKd(0.1).setKs(0.1)));
+
+        // Adding disks to the towers
+        int delta = 50;
+        for(int i = 0; i < 6; i++){
+            scene4.geometries.add(new Circle(new Point(100,-100+13*i,20), new Vector(-1,10,1), 40-5*i)
+                            .setEmission(new Color(delta * (i+1),0,200)).setMaterial(new Material().setKd(0.7)),
+                    new Circle(new Point(-100,-100+13*i,20), new Vector(-1,10,1), 40-5*i)
+                            .setEmission(new Color(200,delta * (i+1),0)).setMaterial(new Material().setKd(0.7)),
+                    new Circle(new Point(0,-100+13*i,20), new Vector(-1,10,1), 40-5*i)
+                            .setEmission(new Color(0,150,delta * (i+1))).setMaterial(new Material().setKd(0.7)));
+        }
+
+
+        Color brown = new Color(207,92,26);
+        delta = 0;
+        int zDif = 300;
+        int yDif = 60;
+
+        // adding 3 upper hot air balloons to the scene
+        for(int i = 0; i < 3; i++){
+            scene4.geometries.add(new Cylinder(new Ray(new Point(100-delta,70+yDif,0-zDif), new Vector(1,20,0)),10,25)
+                            .setEmission(brown).setMaterial(new Material().setKd(0.1)),
+                    new Sphere(new Point(100-delta,140+yDif,0-zDif),40)
+                            .setEmission(new Color(red)).setMaterial(new Material().setKd(0.1).setKs(0.1).setKt(0.3)),
+                    new Sphere(new Point(100-delta,140+yDif,0-zDif),30)
+                            .setEmission(new Color(orange)).setMaterial(new Material().setKd(0.1).setKt(0.5)),
+                    new Square(new Point(120-delta,110+yDif,0-zDif), new Point(117-delta,110+yDif,0-zDif), new Point(107-delta,70+yDif,0-zDif), new Point(110-delta,70+yDif,0-zDif))
+                            .setEmission(brown).setMaterial(new Material().setKd(0.1)),
+                    new Square(new Point(80-delta,110+yDif,0-zDif), new Point(83-delta,110+yDif,0-zDif), new Point(93-delta,70+yDif,0-zDif), new Point(90-delta,70+yDif,0-zDif))
+                            .setEmission(brown).setMaterial(new Material().setKd(0.1)));
+
+            delta +=(130+10*i);
+            zDif+=50;
+        }
+
+        // adding 4 lower hot air balloons to the scene
+        delta = -80; zDif = 900; yDif = 30;
+        for(int i = 0; i < 4; i++){
+            scene4.geometries.add(new Cylinder(new Ray(new Point(100-delta,70-yDif,0-zDif), new Vector(1,20,0)),10,25)
+                            .setEmission(brown).setMaterial(new Material().setKd(0.1)),
+                    new Sphere(new Point(100-delta,140-yDif,0-zDif),40)
+                            .setEmission(new Color(26,38,157)).setMaterial(new Material().setKd(0.1).setKt(0.3)),
+                    new Sphere(new Point(100-delta,140-yDif,0-zDif),30)
+                            .setEmission(new Color(green)).setMaterial(new Material().setKd(0.1).setKt(0.3)),
+                    new Sphere(new Point(100-delta,140-yDif,0-zDif),20)
+                            .setEmission(new Color(orange)).setMaterial(new Material().setKd(0.1).setKt(0.3)),
+                    new Square(new Point(120-delta,110-yDif,0-zDif), new Point(117-delta,110-yDif,0-zDif), new Point(107-delta,70-yDif,0-zDif), new Point(110-delta,70-yDif,0-zDif))
+                            .setEmission(brown).setMaterial(new Material().setKd(0.1)),
+                    new Square(new Point(80-delta,110-yDif,0-zDif), new Point(83-delta,110-yDif,0-zDif), new Point(93-delta,70-yDif,0-zDif), new Point(90-delta,70-yDif,0-zDif))
+                            .setEmission(brown).setMaterial(new Material().setKd(0.1)));
+
+            delta +=150;
+            zDif-=50;
+        }
+
+
+        scene4.lights.add(new PointLight(new Color(255,202,0),new Point(0,140,100)));
+        scene4.lights.add(new DirectionalLight(new Color(100,0,100),new Vector(0,0,-1)));
+        scene4.lights.add(new SpotLight(new Color(255,242,0), new Point(100,10,100), new Vector(0,0,-1)));
+        scene4.lights.add(new SpotLight(new Color(255,242,0), new Point(-100,10,100), new Vector(0,0,-1)));
+
+
+        camera4.setImageWriter(new ImageWriter("picture2MP2", 500, 500)) //
+                .setRayTracer(new RayTracerBasic(scene4))
+                .renderImage() //
+                .writeToImage();
     }
 
 
