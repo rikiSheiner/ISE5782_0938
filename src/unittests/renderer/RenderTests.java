@@ -54,7 +54,6 @@ public class RenderTests {
         camera.writeToImage();
     }
 
-// For stage 6 - please disregard in stage 5
     /**
      * Produce a scene with basic 3D model - including individual lights of the
      * bodies and render it into a png image with a grid
@@ -87,38 +86,4 @@ public class RenderTests {
         camera.writeToImage();
     }
 
-
-    /**
-     * Test for XML based scene - for bonus
-     * @throws ParserConfigurationException
-     * @throws IOException
-     * @throws SAXException
-     */
-    @Test
-    public void basicRenderXml() throws ParserConfigurationException, IOException, SAXException {
-        Scene scene = new Scene("XML Test scene");
-        // enter XML file name and parse from XML file into scene object
-        // ...
-
-        String fileName = "C:/Users/1/Downloads/basicRenderTestTwoColors.xml";
-
-        File file = new File(fileName);
-        if(file.exists()) {
-            DocumentBuilderFactory fact = DocumentBuilderFactory.newInstance();
-            DocumentBuilder builder = fact.newDocumentBuilder();
-            Document doc = builder.parse(fileName);
-
-        ///...
-        }
-
-
-        Camera camera = new Camera(new Point(0,0,0), new Vector(0, 0, -1), new Vector(0, 1, 0)) //
-                .setVPDistance(100) //
-                .setVPSize(500, 500)
-                .setImageWriter(new ImageWriter("xml render test", 1000, 1000))
-                .setRayTracer(new RayTracerBasic(scene));
-        camera.renderImage();
-        camera.printGrid(100, new Color(java.awt.Color.YELLOW));
-        camera.writeToImage();
-    }
 }

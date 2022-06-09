@@ -1,9 +1,11 @@
 package geometries;
 
 import primitives.Double3;
+import primitives.Point;
 import primitives.Ray;
 import primitives.Vector;
 
+import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -42,32 +44,45 @@ public class Cylinder extends Tube {
 
     @Override
     protected List<GeoPoint> findGeoIntersectionsHelper(Ray ray) {
-        Double3 pos = ray.getP0().getXyz();
-        Vector dir = ray.getDir();
-        Vector center = this.axisRay.getDir();
+        List<GeoPoint> intersections = new LinkedList<>();
+        double delta, a, b, c;
+        Ray new_ray;
+        Vector c_to_o;
+        Vector rot;
 
-        double a = (dir.getXyz().getD1() * dir.getXyz().getD1()) + (dir.getXyz().getD3() * dir.getXyz().getD3());
-        double b = 2*(dir.getXyz().getD1()*(pos.getD1()-center.getXyz().getD1()) + dir.getXyz().getD3()*(pos.getD3()-center.getXyz().getD3()));
-        double c = (pos.getD1() - center.getXyz().getD1()) * (pos.getD1() - center.getXyz().getD1()) +
-                (pos.getD3() - center.getXyz().getD3()) * (pos.getD3() - center.getXyz().getD3()) - (radius*radius);
+        rot = this.axisRay.getDir().normalize();
+        new_ray = new Ray(ray.getP0(), ray.getDir().crossProduct(rot));
+        c_to_o = ray.getP0().subtract(this.axisRay.getP0());
+        a = new_ray.getDir().dotProduct(new_ray.getDir());
+        b = 2 * (new_ray.getDir().dotProduct(c_to_o.crossProduct(rot)));
+        c = (c_to_o.crossProduct(rot)).dotProduct(c_to_o.crossProduct(rot))-Math.pow(this.radius, 2);
+        delta = Math.pow(b, 2) - 4 * c * a;
 
-        double delta = b*b - 4*(a*c);
-        if(Math.abs(delta) < 0.001) return null;
-        if(delta < 0.0) return null;
-
-        double t1 = (-b - Math.sqrt(delta))/(2*a);
-        double t2 = (-b + Math.sqrt(delta))/(2*a);
-        double t;
-
-        if (t1>t2) t = t2;
-        else t = t1;
-
-        double r = pos.getD2() + t * dir.getXyz().getD2();
-
-        if ((r >= center.getXyz().getD2()) && (r <= center.getXyz().getD2() + height))
-            return List.of(new GeoPoint(this, ray.getPoint(t)));
-        else
+        if (delta < 0)
             return null;
+
+        double t1 = (-b - Math.sqrt(delta)) / (2 * a);
+        double t2 = (-b + Math.sqrt(delta)) / (2 * a);
+
+        if (t2 < 0) return null;
+
+        double max = Math.sqrt(Math.pow(this.height / 2, 2) + Math.pow(this.radius, 2)); //pythagoras theorem
+
+        Point point = ray.getPoint(t1);
+        Vector len = point.subtract(this.axisRay.getP0());
+
+        if (len.length() <= max)
+            intersections.add(new GeoPoint(this, point));
+
+        point = ray.getPoint(t2);
+        len = point.subtract(this.axisRay.getP0());
+        if (len.length() <= max)
+            intersections.add(new GeoPoint(this, point));
+
+        if(intersections.size() > 0)
+            return intersections;
+
+        return null;
     }
 
     /**
@@ -77,34 +92,50 @@ public class Cylinder extends Tube {
      * @return List of GeoPoint
      */
     @Override
-    protected List<GeoPoint> findGeoIntersectionsHelper(Ray ray, double maxDistance){
+    protected List<GeoPoint> findGeoIntersectionsHelper(Ray ray, double maxDistance) {
+        List<GeoPoint> intersections = new LinkedList<>();
+        double delta, a, b, c;
+        Ray new_ray;
+        Vector c_to_o;
+        Vector rot;
 
-        Double3 pos = ray.getP0().getXyz();
-        Vector dir = ray.getDir();
-        Vector center = this.axisRay.getDir();
+        rot = this.axisRay.getDir().normalize();
+        new_ray = new Ray(ray.getP0(), ray.getDir().crossProduct(rot));
+        c_to_o = ray.getP0().subtract(this.axisRay.getP0());
+        a = new_ray.getDir().dotProduct(new_ray.getDir());
+        b = 2 * (new_ray.getDir().dotProduct(c_to_o.crossProduct(rot)));
+        c = (c_to_o.crossProduct(rot)).dotProduct(c_to_o.crossProduct(rot))-Math.pow(this.radius, 2);
+        delta = Math.pow(b, 2) - 4 * c * a;
 
-        double a = (dir.getXyz().getD1() * dir.getXyz().getD1()) + (dir.getXyz().getD3() * dir.getXyz().getD3());
-        double b = 2*(dir.getXyz().getD1()*(pos.getD1()-center.getXyz().getD1()) + dir.getXyz().getD3()*(pos.getD3()-center.getXyz().getD3()));
-        double c = (pos.getD1() - center.getXyz().getD1()) * (pos.getD1() - center.getXyz().getD1()) +
-                (pos.getD3() - center.getXyz().getD3()) * (pos.getD3() - center.getXyz().getD3()) - (radius*radius);
+        if (delta < 0)
+            return null;
 
-        double delta = b*b - 4*(a*c);
-        if(Math.abs(delta) < 0.001) return null;
-        if(delta < 0.0) return null;
+        double t1 = (-b - Math.sqrt(delta)) / (2 * a);
+        double t2 = (-b + Math.sqrt(delta)) / (2 * a);
 
-        double t1 = (-b - Math.sqrt(delta))/(2*a);
-        double t2 = (-b + Math.sqrt(delta))/(2*a);
-        double t;
+        if (t2 < 0) return null;
 
-        if (t1>t2) t = t2;
-        else t = t1;
+        double max = Math.sqrt(Math.pow(this.height / 2, 2) + Math.pow(this.radius, 2)); //pythagoras theorem
 
-        double r = pos.getD2() + t*dir.getXyz().getD2();
+        Point point = ray.getPoint(t1);
+        Vector len = point.subtract(this.axisRay.getP0());
 
-        if ((r >= center.getXyz().getD2()) && (r <= center.getXyz().getD2() + height))
-            if(ray.getPoint(t).distance(ray.getP0()) <= maxDistance)
-                return List.of(new GeoPoint(this, ray.getPoint(t)));
+        if (len.length() <= max)
+            if(point.distance(ray.getP0()) <= maxDistance)
+                intersections.add(new GeoPoint(this, point));
+
+        point = ray.getPoint(t2);
+        len = point.subtract(this.axisRay.getP0());
+        if (len.length() <= max)
+            if(point.distance(ray.getP0()) <= maxDistance)
+                intersections.add(new GeoPoint(this, point));
+
+        if(intersections.size() > 0)
+            return intersections;
 
         return null;
     }
+
+
+
 }

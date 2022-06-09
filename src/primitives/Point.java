@@ -28,7 +28,7 @@ public class Point {
      * Point constructor based on point with 3 coordinates.
      * @param double3 - the point
      * */
-    Point(Double3 double3) {
+     Point(Double3 double3) {
         xyz = double3;
     }
 
