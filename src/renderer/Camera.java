@@ -80,7 +80,7 @@ public class Camera {
     /**
      * indicates whether we use the method of adaptive super sampling or not
      */
-    private boolean is_ASS = false;
+    private boolean isAdaptiveSuperSampling = false;
     /**
      * the maximal difference between the average color to the color of the sample
      * for stopping of sampling in ASS
@@ -304,8 +304,8 @@ public class Camera {
         this.numThreads = numThreads;
         return this;
     }
-    public Camera setIs_ASS(boolean is_ASS) {
-        this.is_ASS = is_ASS;
+    public Camera setAdaptiveSuperSampling(boolean adaptiveSuperSampling) {
+        this.isAdaptiveSuperSampling = adaptiveSuperSampling;
         return this;
     }
 
@@ -421,7 +421,7 @@ public class Camera {
     }
 
     /**
-     * Function calcColor_ASS is used for calculating the color of pixel using
+     * Function calcColor_AdaptiveSuperSampling is used for calculating the color of pixel using
      * adaptive super sampling
      * @param nX - the number of pixels in X axis
      * @param nY - the number of pixels in Y axis
@@ -429,7 +429,7 @@ public class Camera {
      * @param i  - the index on Y axis
      * @return Color of pixel (j,i)
      */
-    public Color calcColor_ASS(int nX, int nY, int j, int i){
+    public Color calcColor_AdaptiveSuperSampling(int nX, int nY, int j, int i){
         Point Pc = p0.add(vTo.scale(distance)); // the center point of the view plane
 
         double Ry = height / nY; // the height of pixel in the view plane
@@ -440,11 +440,11 @@ public class Camera {
 
         Point p = Pc.add(vRight.scale(Xj)).subtract(vUp.scale(Yi)); // the center of pixel (j,i)
 
-        return calcColor_ASS(Rx,Ry,5,p);
+        return calcColor_AdaptiveSuperSampling(Rx,Ry,5,p);
     }
 
     /**
-     * Function calcColor_ASS is used for calculating the color of pixel using
+     * Function calcColor_AdaptiveSuperSampling is used for calculating the color of pixel using
      * adaptive super sampling
      * @param Rx - the height of subpixel in the view plane
      * @param Ry - the width of subpixel in the view plane
@@ -452,7 +452,7 @@ public class Camera {
      * @param pc - the center point of the subpixel
      * @return Color - the color of the pixel calculated by ASS
      */
-    private Color calcColor_ASS(double Rx, double Ry, int depth, Point pc){
+    private Color calcColor_AdaptiveSuperSampling(double Rx, double Ry, int depth, Point pc){
         List<Ray> rays = new LinkedList<>(); // the beam of rays through the samples
         List<Color> colors = new LinkedList<>(); // list of the colors of the samples
         Color avgColor = new Color (0,0,0); // the average color of the samples
@@ -482,28 +482,28 @@ public class Camera {
         // we will continue to sample in the upper right sub-pixel
         if(Math.abs(avgColor.diff(colors.get(0))) > MAX_DIF){
             newPc = new Point(pc.getXyz().getD1() +Rx/4, pc.getXyz().getD2() + Ry/4, pc.getXyz().getD3());;
-            colors.set(0, calcColor_ASS(Rx/2, Ry/2,depth-1,  newPc));
+            colors.set(0, calcColor_AdaptiveSuperSampling(Rx/2, Ry/2,depth-1,  newPc));
         }
 
         // If the color of the second sample is very different from the average color
         // we will continue to sample in the lower right sub-pixel
         if(Math.abs(avgColor.diff(colors.get(1))) > MAX_DIF){
             newPc = new Point(pc.getXyz().getD1() +Rx/4, pc.getXyz().getD2() - Ry/4, pc.getXyz().getD3());;
-            colors.set(1, calcColor_ASS(Rx/2, Ry/2,depth-1,  newPc));
+            colors.set(1, calcColor_AdaptiveSuperSampling(Rx/2, Ry/2,depth-1,  newPc));
         }
 
         // If the color of the third sample is very different from the average color
         // we will continue to sample in the upper left sub-pixel
         if(Math.abs(avgColor.diff(colors.get(2))) > MAX_DIF){
             newPc = new Point(pc.getXyz().getD1() -Rx/4, pc.getXyz().getD2() + Ry/4, pc.getXyz().getD3());;
-            colors.set(2, calcColor_ASS(Rx/2, Ry/2,depth-1,  newPc));
+            colors.set(2, calcColor_AdaptiveSuperSampling(Rx/2, Ry/2,depth-1,  newPc));
         }
 
         // If the color of the fourth sample is very different from the average color
         // we will continue to sample in the lower left sub-pixel
         if(Math.abs(avgColor.diff(colors.get(3))) > MAX_DIF){
             newPc = new Point(pc.getXyz().getD1() -Rx/4, pc.getXyz().getD2() - Ry/4, pc.getXyz().getD3());;
-            colors.set(3, calcColor_ASS( Rx/2, Ry/2, depth-1,  newPc));
+            colors.set(3, calcColor_AdaptiveSuperSampling( Rx/2, Ry/2, depth-1,  newPc));
         }
 
         // calculating the average color of the samples
@@ -555,11 +555,11 @@ public class Camera {
                     });
                 });
             }
-            else if(is_ASS){ // adaptive super sampling
+            else if(isAdaptiveSuperSampling){ // adaptive super sampling
                 Pixel.initialize(nY, nX, Pixel.printInterval);
                 IntStream.range(0, nY).parallel().forEach(i -> {
                     IntStream.range(0, nX).parallel().forEach(j -> {
-                        imageWriter.writePixel(j, i, calcColor_ASS(nX, nY, j, i));
+                        imageWriter.writePixel(j, i, calcColor_AdaptiveSuperSampling(nX, nY, j, i));
                         Pixel.pixelDone();
                         Pixel.printPixel();
                     });
