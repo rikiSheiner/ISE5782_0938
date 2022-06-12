@@ -436,7 +436,7 @@ public class FinalPictureTests {
         scene3.lights.add(new PointLight(new Color(255,242,0), new Point(130,100,-60)));
 
 
-        camera3.setImageWriter(new ImageWriter("picture1MP2", 500, 500)) //
+        camera3.setImageWriter(new ImageWriter("picture1MP2", 1000, 1000)) //
                 .setRayTracer(new RayTracerBasic(scene3)) //
                 .renderImage() //
                 .writeToImage();
@@ -527,7 +527,7 @@ public class FinalPictureTests {
         scene4.lights.add(new SpotLight(new Color(255,242,0), new Point(-100,10,100), new Vector(0,0,-1)));
 
 
-        camera4.setImageWriter(new ImageWriter("picture2MP2", 500, 500)) //
+        camera4.setImageWriter(new ImageWriter("picture2MP2", 1000, 1000)) //
                 .setRayTracer(new RayTracerBasic(scene4))
                 .renderImage() //
                 .writeToImage();
